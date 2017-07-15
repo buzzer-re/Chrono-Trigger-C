@@ -2,7 +2,7 @@
  * Player.c
  *
  *  Created on: 13 de jul de 2017
- *      Author: bigboss
+ *      Author: Anderson
  */
 
 

@@ -2,7 +2,7 @@
  * Stage.c
  *
  *  Created on: 14 de jul de 2017
- *      Author: bigboss
+ *      Author: Anderson
  */
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

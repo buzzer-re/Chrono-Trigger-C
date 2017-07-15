@@ -2,7 +2,7 @@
  * Stage.h
  *
  *  Created on: 14 de jul de 2017
- *      Author: bigboss
+ *      Author: Anderson
  */
 
 #ifndef STAGE_H_
