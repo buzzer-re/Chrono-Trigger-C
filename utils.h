@@ -2,7 +2,7 @@
  * utils.h
  *
  *  Created on: 13 de jul de 2017
- *      Author: bigboss
+ *      Author: Anderson
  */
 #ifndef UTILS_H_
 #define UTILS_H_
