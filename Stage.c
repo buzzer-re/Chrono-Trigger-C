@@ -14,7 +14,7 @@
 
 
 void setupStage(STAGE* stage_conf){
-	*stage_conf->surface = IMG_Load("Resourcers/mapaFloresta.png");
+	*stage_conf->surface = IMG_Load("Resourcers/magus.png");
 	if(!*stage_conf->surface){
 		SDL_Log("Error in load map! %s ", SDL_GetError());
 	}
@@ -26,10 +26,10 @@ void setupStage(STAGE* stage_conf){
 
 	SDL_QueryTexture(*stage_conf->tex, NULL,NULL, &stage_conf->stage->w, &stage_conf->stage->y);
 
-	stage_conf->stage->h = 2000;
-	stage_conf->stage->w = 2000;
-	stage_conf->stage->x = -100;
-	stage_conf->stage->y = -1360;
+	stage_conf->stage->h = 10000;
+	stage_conf->stage->w = 6000;
+	stage_conf->stage->x = -1350;
+	stage_conf->stage->y = -9360;
 	stage_conf->limitY = stage_conf->stage->y;
 
 	SDL_FreeSurface(*stage_conf->surface);

@@ -16,14 +16,17 @@
 
 #define SPEED 2
 #define TROCA 6
-#define STAGE_VEL 2
-#define MARGEM_ERRO 20
+#define STAGE_VEL 1
+#define MARGEM_ERRO 10
+
+int accel = 1;
 
 int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 {
 
 	char* path;
 	variacaoSprite = 0;
+	variacaoRigth = 0;
 	//		free(*tex);
 	if(!strcmp(conf->name,"crono") && conf->start != 1){
 		path = "Resourcers/cronoNormal1.png";
@@ -50,9 +53,6 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 	SDL_FreeSurface(*conf->surface);
 
 	return 1;
-
-
-
 }
 
 void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
@@ -90,6 +90,9 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 			case SDL_SCANCODE_Q:
 				*run = 0;
 				break;
+			case SDL_SCANCODE_K:
+				accel = 30;
+				break;
 			}break;
 			case SDL_KEYUP:
 				switch(event.key.keysym.scancode){
@@ -121,9 +124,13 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 					changeSprite(conf, sprite, 1);
 					down = 0;
 					break;
+				case SDL_SCANCODE_K:
+					accel = 1;
+					break;
 				}break;
 		}
 	}
+
 	if(up){
 		variacaoSprite++;
 		if(variacaoSprite % TROCA == 0){
@@ -132,11 +139,17 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 				conf->numSprite = 1;
 			changeSprite(conf,sprite,0);
 		}
-		if(stage_conf->stage->y != 0)
-			stage_conf->stage->y += STAGE_VEL;
-		else
-			if(sprite->y > 0)
-				sprite->y -= SPEED + STAGE_VEL;
+		if(sprite->y < stage_conf->heigth/2){
+			if(stage_conf->stage->y < 1)
+				stage_conf->stage->y += STAGE_VEL + SPEED * accel;
+			else{
+				if(sprite->y > 0)
+					sprite->y -= SPEED + STAGE_VEL * accel;
+			}
+		}else
+			sprite->y -= SPEED + STAGE_VEL * accel;
+
+		SDL_Log("%d", sprite->y);
 	}
 
 	if(down){
@@ -147,13 +160,17 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 				conf->numSprite = 1;
 			changeSprite(conf, sprite,0);
 			SDL_Log("Sprite num -> %d", conf->numSprite);
-//			sprite->y;
 		}
-		if(stage_conf->stage->y > stage_conf->limitY)
-			stage_conf->stage->y -= STAGE_VEL;
-		else
-			if(sprite->y < stage_conf->limitY)
-				sprite->y += SPEED + STAGE_VEL;
+		if(sprite->y > stage_conf->heigth/2){
+			if(stage_conf->stage->y > stage_conf->limitY)
+				stage_conf->stage->y -= STAGE_VEL + SPEED * accel;
+			else
+				if(sprite->y < stage_conf->heigth - sprite->h)
+					sprite->y += SPEED + STAGE_VEL* accel;
+		}else{
+			sprite->y += SPEED + STAGE_VEL* accel;
+		}
+		SDL_Log("%d", sprite->y);
 	}
 
 	if(left){
@@ -163,15 +180,17 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 			if(conf->numSprite > 6)
 				conf->numSprite = 1;
 			changeSprite(conf, sprite, 0);
-			sprite->x -= SPEED;
+			//			sprite->x -= SPEED;
 		}
-
-		if(stage_conf->stage->x != 0)
-			stage_conf->stage->x += STAGE_VEL;
-		else
-			if(sprite->x > 0)
-				sprite->x -= SPEED + STAGE_VEL;
-
+		if(sprite->x < stage_conf->width/2){
+			if(stage_conf->stage->x != 0)
+				stage_conf->stage->x += STAGE_VEL + SPEED* accel;
+			else
+				if(sprite->x > 0)
+					sprite->x -= SPEED + STAGE_VEL* accel;
+		}else{
+			sprite->x -= SPEED + STAGE_VEL* accel;
+		}
 
 	}
 
@@ -183,15 +202,20 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 				conf->numSprite = 1;
 			changeSprite(conf, sprite, 0);
 		}
-		if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x)))
-			stage_conf->stage->x -= STAGE_VEL;
-		else{
-			if(sprite->x < -stage_conf->stage->x)
-				sprite->x += SPEED + STAGE_VEL;
-			SDL_Log("foi");
+		if(sprite->x > stage_conf->width/2){
+			if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x)))
+				stage_conf->stage->x -= STAGE_VEL + SPEED* accel;
+			else{
+				if(sprite->x < stage_conf->width - sprite->w)
+					sprite->x += SPEED + STAGE_VEL* accel;
+			}
+		}else{
+			sprite->x += SPEED + STAGE_VEL* accel;
+			variacaoRigth += SPEED + STAGE_VEL* accel;
+
 		}
 
-		SDL_Log("%d",( stage_conf->stage->w + stage_conf->stage->x ));
+		//		SDL_Log("%d",( stage_conf->stage->w + stage_conf->stage->x ));
 
 	}
 	SDL_Delay(6);
@@ -229,7 +253,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		if(conf->down)
 			sprintf(conf->pathSprite, "%s%d%s", "Resourcers/cronoWalkDown", conf->numSprite, ".png");
 
-//		SDL_Log("%d", conf->up);
+		//		SDL_Log("%d", conf->up);
 		*conf->surface = IMG_Load(conf->pathSprite);
 	}
 
@@ -245,6 +269,6 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 	sprite_rect->w = 60;
 	sprite_rect->h = 100;
 	SDL_FreeSurface(*conf->surface);
-//	SDL_Log("Possivel erro -> %s", SDL_GetError());
+	//	SDL_Log("Possivel erro -> %s", SDL_GetError());
 
 }

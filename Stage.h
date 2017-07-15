@@ -17,6 +17,7 @@ typedef struct stage_conf{
 	SDL_Texture** tex;
 	SDL_Rect* stage;
 	int limitY, limitX;
+	int width, heigth;
 }STAGE;
 
 void setupStage(STAGE*);

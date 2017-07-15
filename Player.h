@@ -28,6 +28,7 @@ typedef struct player_info {
 
 int up, down, left, right;
 int variacaoSprite;
+int variacaoRigth;
 
 int setupSprite(PlayerConf*,SDL_Rect*);
 

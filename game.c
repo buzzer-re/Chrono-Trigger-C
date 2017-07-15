@@ -18,7 +18,7 @@
 #include "Player.h"
 #include "Stage.h"
 
-#define WIDTH_SCREEN 1000
+#define WIDTH_SCREEN 800
 #define HEIGH_SCREEN 640
 #define FPS 6
 
@@ -30,12 +30,12 @@ int main(int argc, char **argv) {
 	}
 	int contMusica = 1;
 
-	if(Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) < 0){
+	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0){
 		SDL_Log("Error in audio init! %s",Mix_GetError() );
 		return -1;
 	}
 
-	Mix_Music* bgm = Mix_LoadMUS("Sounds/Schala.mp3");
+	Mix_Music* bgm = Mix_LoadMUS("Sounds/magus.mp3");
 
 	//	Mix_Chunk* sound = Mix_Load;
 
@@ -63,7 +63,10 @@ int main(int argc, char **argv) {
 	stage_conf.tex = &texturaStage;
 	stage_conf.surface = &surfaceStage;
 	stage_conf.limitX = WIDTH_SCREEN;
+	stage_conf.width = WIDTH_SCREEN;
+	stage_conf.heigth = HEIGH_SCREEN;
 	setupStage(&stage_conf);
+
 	if(!setupSprite(&crono_conf, &crono))
 	{
 		SDL_Log("Error %s", SDL_GetError());
@@ -90,6 +93,7 @@ int main(int argc, char **argv) {
 
 		SDL_RenderFillRect(render, &crono);
 		move(&crono,&run,&crono_conf, &stage_conf);
+//		mouseSet(&stage_conf);
 		SDL_RenderCopy(render, texturaStage, NULL, &stageRect);
 		SDL_RenderCopy(render, tex, NULL, &crono);
 		SDL_RenderPresent(render);
