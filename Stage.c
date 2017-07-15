@@ -26,10 +26,10 @@ void setupStage(STAGE* stage_conf){
 
 	SDL_QueryTexture(*stage_conf->tex, NULL,NULL, &stage_conf->stage->w, &stage_conf->stage->y);
 
-	stage_conf->stage->h = 10000;
-	stage_conf->stage->w = 6000;
-	stage_conf->stage->x = -1350;
-	stage_conf->stage->y = -9360;
+	stage_conf->stage->h = 1060;
+	stage_conf->stage->w = 1120;
+	stage_conf->stage->x = 0;
+	stage_conf->stage->y = -420;
 	stage_conf->limitY = stage_conf->stage->y;
 
 	SDL_FreeSurface(*stage_conf->surface);

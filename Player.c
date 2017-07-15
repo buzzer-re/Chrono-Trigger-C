@@ -173,17 +173,16 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 		SDL_Log("%d", sprite->y);
 	}
 
-	if(left){
+	if(left){				///TODO dar uma olhada dps
 		variacaoSprite++;
 		if(variacaoSprite % TROCA == 0){
 			conf->numSprite++;
 			if(conf->numSprite > 6)
 				conf->numSprite = 1;
 			changeSprite(conf, sprite, 0);
-			//			sprite->x -= SPEED;
 		}
 		if(sprite->x < stage_conf->width/2){
-			if(stage_conf->stage->x != 0)
+			if(stage_conf->stage->x < 0)
 				stage_conf->stage->x += STAGE_VEL + SPEED* accel;
 			else
 				if(sprite->x > 0)
@@ -191,6 +190,7 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 		}else{
 			sprite->x -= SPEED + STAGE_VEL* accel;
 		}
+		SDL_Log("%d", stage_conf->stage->x);
 
 	}
 
