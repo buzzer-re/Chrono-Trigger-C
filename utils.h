@@ -23,5 +23,5 @@ int variacaoRigth;
 
 void initScreen(SDL_Window**, SDL_Renderer**,int,int);
 
-void move(SDL_Rect*,int*,PlayerConf*,STAGE*);
+
 #endif /* UTILS_H_ */

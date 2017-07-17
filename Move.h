@@ -13,6 +13,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
+
 #include "Stage.h"
 #include "Player.h"
 #include "Monster.h"
@@ -22,6 +23,11 @@ int variacaoSprite;
 int variacaoRigth;
 
 
-void move(SDL_Rect*,int*,PlayerConf*,STAGE*);
+int move(SDL_Rect* ,int* ,PlayerConf* ,STAGE* ,MonsterInfo*);
 
+int collisionCheck(PlayerConf*,STAGE*,MonsterInfo*);
+
+void change(PlayerConf*, MonsterInfo*,int);
+
+int battleConf(PlayerConf*,STAGE*,MonsterInfo*);
 #endif /* MOVE_H_ */

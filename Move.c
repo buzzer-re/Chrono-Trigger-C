@@ -19,11 +19,11 @@
 #define MARGEM_ERRO 10
 
 
-/// TODO ORGANIZAR MOVIMENTAÇÃO PARA TODOS ELEMENTOS! (Monstros e etc..)
+/// TODO Iniciar sistema de encontro para batalha
 
 int accel = 1;
 
-void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
+int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInfo* monster)
 {
 	/*
 	 * 	flag 1 -> crono
@@ -126,17 +126,12 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 
 	if(up && !conf->battleState){
 		variacaoSprite++;
-		if(variacaoSprite % TROCA == 0){
-			conf->numSprite++;
-			if(conf->numSprite > 6)
-				conf->numSprite = 1;
-			changeSprite(conf,sprite,0);
-		}
+		change(conf, monster,NULL);
 		if(sprite->y < stage_conf->heigth/2){
-			if(stage_conf->stage->y < 1)
+			if(stage_conf->stage->y < 1){
 				stage_conf->stage->y += STAGE_VEL + SPEED * accel;
-
-
+				monster->monsterRect->y += STAGE_VEL + SPEED * accel;
+			}
 			else{
 				if(sprite->y > 0)
 					sprite->y -= SPEED + STAGE_VEL * accel;
@@ -149,16 +144,13 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 
 	if(down && !conf->battleState){
 		variacaoSprite++;
-		if(variacaoSprite % TROCA == 0){
-			conf->numSprite++;
-			if(conf->numSprite > 8)
-				conf->numSprite = 1;
-			changeSprite(conf, sprite,0);
-			SDL_Log("Sprite num -> %d", conf->numSprite);
-		}
+		change(conf, monster,NULL);
 		if(sprite->y > stage_conf->heigth/2){
-			if(stage_conf->stage->y > stage_conf->limitY)
+			if(stage_conf->stage->y > stage_conf->limitY){
 				stage_conf->stage->y -= STAGE_VEL + SPEED * accel;
+				monster->monsterRect->y -= STAGE_VEL + SPEED * accel;
+			}
+
 			else
 				if(sprite->y < stage_conf->heigth - sprite->h)
 					sprite->y += SPEED + STAGE_VEL* accel;
@@ -170,15 +162,13 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 
 	if(left && !conf->battleState){				///TODO dar uma olhada dps
 		variacaoSprite++;
-		if(variacaoSprite % TROCA == 0){
-			conf->numSprite++;
-			if(conf->numSprite > 6)
-				conf->numSprite = 1;
-			changeSprite(conf, sprite, 0);
-		}
+		change(conf, monster,NULL);
 		if(sprite->x < stage_conf->width/2){
-			if(stage_conf->stage->x < 0)
+			if(stage_conf->stage->x < 0){
 				stage_conf->stage->x += STAGE_VEL + SPEED* accel;
+				monster->monsterRect->x += STAGE_VEL + SPEED * accel;
+			}
+
 			else
 				if(sprite->x > 0)
 					sprite->x -= SPEED + STAGE_VEL* accel;
@@ -191,15 +181,13 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 
 	if(right && !conf->battleState){
 		variacaoSprite++;
-		if(variacaoSprite % TROCA == 0){
-			conf->numSprite++;
-			if(conf->numSprite > 6)
-				conf->numSprite = 1;
-			changeSprite(conf, sprite, 0);
-		}
+		change(conf, monster,NULL);
 		if(sprite->x > stage_conf->width/2){
-			if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x)))
+			if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x))){
 				stage_conf->stage->x -= STAGE_VEL + SPEED* accel;
+				monster->monsterRect->x -= STAGE_VEL + SPEED * accel;
+			}
+
 			else{
 				if(sprite->x < stage_conf->width - sprite->w)
 					sprite->x += SPEED + STAGE_VEL* accel;
@@ -213,17 +201,75 @@ void move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf)
 	}
 
 	if(conf->battleState){
-		variacaoSprite++;
-		if(variacaoSprite % (TROCA + 2) == 0){
-			conf->numSprite++;
-			if(conf->numSprite > 4){
-				conf->numSprite = 4;
-				battleState(conf);
-			}
+		if(conf->ready){
+			variacaoSprite++;
+			if(variacaoSprite % (TROCA + 5) == 0){
+				conf->numSprite++;
+				if(conf->numSprite > 4){
+					conf->numSprite = 4;
 
-			changeSprite(conf, sprite, 0);
-		}
-		battleState(conf);
+				}
+				changeSprite(conf, sprite, 0);
+				return 1;
+			}
+		}else
+			battleConf(conf,stage_conf, monster);
+
 	}
+	return 0;
 	SDL_Delay(6);
+}
+
+void change(PlayerConf* player, MonsterInfo* monster,int flag){
+	int limit;
+
+	if(player->up || flag)
+		limit = 6;
+	else if(player->down || flag == 2)
+		limit = 8;
+	else if(player->rigth || flag == 3)
+		limit = 6;
+	else if(player->left || flag == 4)
+		limit = 6;
+
+	if(variacaoSprite % TROCA == 0){
+		player->numSprite++;
+		if(player->numSprite > limit)
+			player->numSprite = 1;
+		changeSprite(player,player->sprite,0);
+	}
+}
+
+int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
+
+	SDL_Rect aux; // retangulo auxiliar
+
+	//	SDL_Log("testando...");
+	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE){
+		if(!player->battleState)
+			player->numSprite = 0;
+		player->battleState = 1;
+		monster->battleState = 1;
+		//		SDL_Log("%d", player->numSprite);
+
+		return 1;
+	}
+	return 0;
+}
+
+int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
+	if(player->sprite->y > monster->monsterRect->y + (monster->monsterRect->h * 2) ){
+		player->numSprite = 1;
+		player->ready = 1;
+	}
+	else{
+		variacaoSprite++;
+		player->flag = 2;
+		change(player, monster,2);
+		player->sprite->y += SPEED + STAGE_VEL;
+
+	}
+
+
+	return 0;
 }

@@ -36,8 +36,9 @@ void setupMonster(MonsterInfo* monster){
 	monster->monsterRect->w *= 3;
 	monster->monsterRect->h *= 3;
 	monster->monsterRect->x = 400;
-	monster->monsterRect->y = 400;
+	monster->monsterRect->y = 200;
 	monster->battle = (MonsterBattle*) malloc(sizeof(MonsterBattle) * 50);
+	monster->battleState = 0;
 	SDL_Log("foi %s", SDL_GetError());
 
 }
@@ -46,13 +47,14 @@ void setupMonster(MonsterInfo* monster){
 
 void moveMonster(MonsterInfo* monster){
 	variacaoSpriteM++;
+	if(!monster->battleState){
+		if(variacaoSpriteM > 150)
+			variacaoSpriteM = 0;
 
-	if(variacaoSpriteM > 150)
-		variacaoSpriteM = 0;
+		if(variacaoSpriteM < 50)
+			monster->monsterRect->x += 3;
 
-	if(variacaoSpriteM < 50)
-		monster->monsterRect->x += 3;
-
-	if(variacaoSpriteM > 100)
-		monster->monsterRect->x -= 3;
+		if(variacaoSpriteM > 100)
+			monster->monsterRect->x -= 3;
+	}
 }

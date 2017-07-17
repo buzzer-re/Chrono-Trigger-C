@@ -30,14 +30,15 @@ int main(int argc, char **argv) {
 		SDL_Log("Error in init! %s", SDL_GetError());
 		return -1;
 	}
+	int battle = 0;
 	int contMusica = 1;
 
-	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0){
-		SDL_Log("Error in audio init! %s",Mix_GetError() );
-		return -1;
-	}
 
-	Mix_Music* bgm = Mix_LoadMUS("Sounds/magus.mp3");
+	if(Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+		SDL_Log("%s", SDL_GetError());
+
+	Mix_Music* bgm = Mix_LoadMUS("Sounds/black.mp3");
+	Mix_Music* battleSong = Mix_LoadMUS("Sounds/boss2.mp3");
 
 	//	Mix_Chunk* sound = Mix_Load;
 
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
 	crono_conf->surface = &surface;
 	crono_conf->tex = &tex;
 	crono_conf->name = "crono";
-
+	crono_conf->sprite = &crono;
 	//stage
 	SDL_Rect stageRect;
 	SDL_Surface* surfaceStage;
@@ -109,12 +110,19 @@ int main(int argc, char **argv) {
 		SDL_RenderClear(render);
 		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 		SDL_RenderCopy(render, texturaStage, NULL, &stageRect);
-		SDL_RenderCopy(render, tex, NULL, &crono);
 		SDL_RenderCopy(render,monsterTex,NULL,&monsterRect);
-		SDL_RenderDrawRect(render, &crono);
-		SDL_RenderDrawRect(render, &monsterRect);
+		SDL_RenderCopy(render, tex, NULL, &crono);
+//		SDL_RenderDrawRect(render, &crono);
+//		SDL_RenderDrawRect(render, &monsterRect);
 		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
-		move(&crono,&run,crono_conf, &stage_conf);
+		collisionCheck(crono_conf, &stage_conf, monster);
+		if(move(&crono,&run,crono_conf,&stage_conf,monster)){
+			if(!battle){
+				//				Mix_CloseAudio();
+				Mix_PlayMusic(battleSong, -1);
+				battle = 1;
+			}
+		}
 		moveMonster(monster);
 		SDL_RenderPresent(render);
 		SDL_Delay(FPS);
@@ -124,10 +132,11 @@ int main(int argc, char **argv) {
 	Mix_Quit();
 
 	Mix_FreeMusic(bgm);
-
+	Mix_FreeMusic(battle);
 	bgm = NULL;
 
-
+	free(crono_conf);
+	free(monster);
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(render);
 	SDL_Quit();

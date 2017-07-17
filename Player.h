@@ -14,6 +14,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include "Stage.h"
+#include "Monster.h"
 
 typedef struct player_battle{
 	int hp, mp;
@@ -26,14 +27,15 @@ typedef struct player_info {
 	SDL_Surface** surface;
 	SDL_Texture** tex;
 	SDL_Renderer** render;
+	SDL_Rect* sprite;
 	char *pathSprite;
 	int start;
 	int numSprite;
-	int up, down, left, rigth;
+	int up, down, left, rigth,flag;
 	char *name;
 	char *FirstSprite;
 	int state;
-	int battleState;
+	int battleState, ready,battleCheckDown;
 	PlayerBattle* battle;
 }PlayerConf;
 
@@ -43,11 +45,11 @@ int variacaoRigth;
 
 int setupSprite(PlayerConf*,SDL_Rect*);
 
-//void move(SDL_Rect*,int*,PlayerConf*,STAGE*);
-
 void changeSprite(PlayerConf*,SDL_Rect*,int);
 
-void battleState(PlayerConf*);
+void battleState(PlayerConf*,MonsterInfo*);
+
+
 
 void drawCollision(PlayerConf*);
 #endif /* PLAYER_H_ */
