@@ -17,6 +17,8 @@
 #include "utils.h"
 #include "Player.h"
 #include "Stage.h"
+#include "Monster.h"
+#include "Move.h" // Movimentação ta bem complicadinha
 
 #define WIDTH_SCREEN 800
 #define HEIGH_SCREEN 640
@@ -43,15 +45,16 @@ int main(int argc, char **argv) {
 	SDL_Renderer* render;
 
 	initScreen(&window,&render, WIDTH_SCREEN,HEIGH_SCREEN);
-	PlayerConf crono_conf;
+	PlayerConf* crono_conf;
+	crono_conf = (PlayerConf*) malloc(sizeof(PlayerConf) * 50);
 	STAGE stage_conf;
 	SDL_Rect crono;
 	SDL_Surface* surface;
 	SDL_Surface* tex;
-	crono_conf.render = &render;
-	crono_conf.surface = &surface;
-	crono_conf.tex = &tex;
-	crono_conf.name = "crono";
+	crono_conf->render = &render;
+	crono_conf->surface = &surface;
+	crono_conf->tex = &tex;
+	crono_conf->name = "crono";
 
 	//stage
 	SDL_Rect stageRect;
@@ -67,9 +70,24 @@ int main(int argc, char **argv) {
 	stage_conf.heigth = HEIGH_SCREEN;
 	setupStage(&stage_conf);
 
-	if(!setupSprite(&crono_conf, &crono))
+
+	// Monster
+
+	MonsterInfo* monster = (MonsterInfo*) malloc(sizeof(MonsterInfo) * 50);
+	SDL_Rect monsterRect;
+	SDL_Surface* monsterSurface;
+	SDL_Texture* monsterTex;
+
+	monster->render = &render;
+	monster->surface = &monsterSurface;
+	monster->tex = &monsterTex;
+	monster->monsterRect = &monsterRect;
+	monster->stage_conf = &stage_conf;
+	setupMonster(monster);
+
+	if(!setupSprite(crono_conf, &crono))
 	{
-		SDL_Log("Error %s", SDL_GetError());
+		SDL_Log("Error s %s", SDL_GetError());
 		SDL_DestroyWindow(window);
 		SDL_DestroyRenderer(render);
 		return -1;
@@ -77,8 +95,7 @@ int main(int argc, char **argv) {
 
 
 	SDL_RenderClear(render);
-	SDL_RenderCopy(render, tex, NULL, &crono);
-	SDL_RenderPresent(render);
+
 	int run = 1;
 	Mix_PlayMusic(bgm, -1);
 
@@ -90,14 +107,17 @@ int main(int argc, char **argv) {
 		}
 
 		SDL_RenderClear(render);
-
-		SDL_RenderFillRect(render, &crono);
-		move(&crono,&run,&crono_conf, &stage_conf);
-//		mouseSet(&stage_conf);
+		SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 		SDL_RenderCopy(render, texturaStage, NULL, &stageRect);
 		SDL_RenderCopy(render, tex, NULL, &crono);
+		SDL_RenderCopy(render,monsterTex,NULL,&monsterRect);
+		SDL_RenderDrawRect(render, &crono);
+		SDL_RenderDrawRect(render, &monsterRect);
+		SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+		move(&crono,&run,crono_conf, &stage_conf);
+		moveMonster(monster);
 		SDL_RenderPresent(render);
-//		SDL_Delay(FPS);
+		SDL_Delay(FPS);
 
 	}
 

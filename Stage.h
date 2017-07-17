@@ -18,6 +18,7 @@ typedef struct stage_conf{
 	SDL_Rect* stage;
 	int limitY, limitX;
 	int width, heigth;
+	int auxX, auxY;
 }STAGE;
 
 void setupStage(STAGE*);
