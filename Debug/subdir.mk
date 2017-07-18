@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Batalha.c \
 ../Monster.c \
 ../Move.c \
 ../Player.c \
@@ -12,6 +13,7 @@ C_SRCS += \
 ../utils.c 
 
 OBJS += \
+./Batalha.o \
 ./Monster.o \
 ./Move.o \
 ./Player.o \
@@ -20,6 +22,7 @@ OBJS += \
 ./utils.o 
 
 C_DEPS += \
+./Batalha.d \
 ./Monster.d \
 ./Move.d \
 ./Player.d \

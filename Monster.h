@@ -29,6 +29,7 @@ typedef struct monster_info{
 	int numSprite;
 	int state;
 	int battleState;
+	int x,y;
 	MonsterBattle* battle;
 	STAGE* stage_conf;
 }MonsterInfo;

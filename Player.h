@@ -32,10 +32,11 @@ typedef struct player_info {
 	int start;
 	int numSprite;
 	int up, down, left, rigth,flag;
+	int x, y;
 	char *name;
 	char *FirstSprite;
 	int state;
-	int battleState, ready,battleCheckDown;
+	int battleState, ready;
 	PlayerBattle* battle;
 }PlayerConf;
 

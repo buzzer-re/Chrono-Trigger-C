@@ -11,9 +11,6 @@
 #include "Monster.h"
 #include <string.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_timer.h>
 
 #define SPEED 2
 #define TROCA 6
@@ -43,7 +40,6 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 	conf->start = 1;
 	conf->state = 1;
 	conf->ready = 0;
-	conf->battleCheckDown = 0;
 	if(!*conf->surface)
 		return 0;
 	*conf->tex = SDL_CreateTextureFromSurface(*conf->render, *conf->surface);
@@ -105,6 +101,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		else if(conf->battleState && conf->state == 2 && conf->ready)
 			sprintf(conf->pathSprite,"%s%d%s","Resourcers/battleLeft",conf->numSprite,".png");
 
+
 		*conf->surface = IMG_Load(conf->pathSprite);
 	}
 
@@ -120,6 +117,5 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 	sprite_rect->w *= 3;
 	sprite_rect->h *= 3;
 	SDL_FreeSurface(*conf->surface);
-	//	SDL_Log("Possivel erro -> %s", SDL_GetError());
 }
 

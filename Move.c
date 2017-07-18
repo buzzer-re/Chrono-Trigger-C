@@ -14,7 +14,7 @@
 #include <SDL2/SDL_timer.h>
 
 #define SPEED 2
-#define TROCA 6
+#define TROCA 15
 #define STAGE_VEL 1
 #define MARGEM_ERRO 10
 
@@ -127,6 +127,146 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 	if(up && !conf->battleState){
 		variacaoSprite++;
 		change(conf, monster,NULL);
+		cameraAdjust(stage_conf, sprite, monster,1);
+		SDL_Log("%d", sprite->y);
+	}
+
+	if((down && !conf->battleState)){
+		variacaoSprite++;
+		change(conf, monster,NULL);
+		cameraAdjust(stage_conf, sprite, monster,2);
+		SDL_Log("%d", sprite->y);
+	}
+
+	if(left && !conf->battleState){
+		variacaoSprite++;
+		change(conf, monster,NULL);
+		cameraAdjust(stage_conf, sprite, monster, 3);
+		SDL_Log("%d", stage_conf->stage->x);
+
+	}
+
+	if(right && !conf->battleState){
+		variacaoSprite++;
+		change(conf, monster,NULL);
+		cameraAdjust(stage_conf, sprite, monster, 4);
+	}
+
+	if(conf->battleState){
+		if(conf->ready){
+			variacaoSprite++;
+			change(conf, monster,NULL);
+			return 1;
+		}else
+			battleConf(conf,stage_conf, monster);
+	}
+
+	//	SDL_Delay(6);
+	SDL_Log("Battle -> %d", conf->battleState);
+	return 0;
+}
+
+int getTroca(PlayerConf* player){
+	if(player->ready)
+			return 9;
+
+	if(up || down || player->flag || player->flag == 2){
+		if(player->battleState)
+			return 6;
+		if((up || down) && (left || right)){
+			return 12;
+		}
+		else
+			return 6;
+	}
+
+	return 6;
+}
+
+void change(PlayerConf* player, MonsterInfo* monster,int flag){
+	int limit;
+	int initialFantasy = 1;
+
+	if(player->up ||player->flag)
+		limit = 6;
+	if(player->down || player->flag == 2)
+		limit = 8;
+	if(player->rigth || player->flag == 3)
+		limit = 6;
+	if(player->left || player->flag == 4)
+		limit = 6;
+	if(player->ready){
+		limit = 4;
+		initialFantasy = 4;
+	}
+	SDL_Log("Variacao -> %d", getTroca(player));
+	if(variacaoSprite % getTroca(player) == 0){
+		player->numSprite++;
+		if(player->numSprite > limit)
+			player->numSprite = initialFantasy;
+		changeSprite(player,player->sprite,0);
+	}
+}
+
+int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
+
+	SDL_Rect aux;
+
+	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE){
+		if(!player->battleState)
+			player->numSprite = 0;
+
+		player->battleState = 1;
+		monster->battleState = 1;
+		return 1;
+	}
+	return 0;
+}
+
+int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
+	if(player->sprite->x != monster->monsterRect->x){
+		variacaoSprite++;
+		if(player->sprite->x < monster->monsterRect->x){
+			player->rigth = 1;
+			change(player, monster,4);
+			cameraAdjust(stage,  player->sprite, monster, 4);
+		}
+		else{
+			player->flag = 3;
+			player->left = 1;
+			change(player, monster,3);
+			cameraAdjust(stage,  player->sprite, monster, 3);
+		}
+	}
+
+	else if(player->sprite->y > monster->monsterRect->y + (monster->monsterRect->h * 2) ){
+		player->numSprite = 1;
+		player->ready = 1;
+		player->flag = 10;
+	}
+	else{
+		variacaoSprite++;
+		player->flag = 2;
+		cameraAdjust(stage, player->sprite, monster,2);
+		change(player, monster, NULL);
+	}
+
+
+	return 0;
+}
+
+int cameraAdjust(STAGE* stage_conf, SDL_Rect* sprite,MonsterInfo* monster, int flag){
+	/*
+	 * 		CAMERA CONTROL, A LOT OF CODE, BUT ITS SIMPLE! PLEASE DONT TOUCH!
+	 * 				A little changes, signal and other stuff... used flags to
+	 * 				know if camera is up, down, rigth or left!
+	 *
+	 *
+	 *
+	 *
+	 * */
+
+	if(flag == 1){ // UP
 		if(sprite->y < stage_conf->heigth/2){
 			if(stage_conf->stage->y < 1){
 				stage_conf->stage->y += STAGE_VEL + SPEED * accel;
@@ -138,50 +278,38 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 			}
 		}else
 			sprite->y -= SPEED + STAGE_VEL * accel;
-
-		SDL_Log("%d", sprite->y);
 	}
 
-	if(down && !conf->battleState){
-		variacaoSprite++;
-		change(conf, monster,NULL);
+
+	if(flag == 2){  // DOWN
 		if(sprite->y > stage_conf->heigth/2){
 			if(stage_conf->stage->y > stage_conf->limitY){
 				stage_conf->stage->y -= STAGE_VEL + SPEED * accel;
 				monster->monsterRect->y -= STAGE_VEL + SPEED * accel;
 			}
-
 			else
 				if(sprite->y < stage_conf->heigth - sprite->h)
 					sprite->y += SPEED + STAGE_VEL* accel;
 		}else{
-			sprite->y += SPEED + STAGE_VEL* accel;
+			sprite->y += SPEED + STAGE_VEL * accel;
 		}
-		SDL_Log("%d", sprite->y);
 	}
 
-	if(left && !conf->battleState){				///TODO dar uma olhada dps
-		variacaoSprite++;
-		change(conf, monster,NULL);
+	if(flag == 3){ // left
 		if(sprite->x < stage_conf->width/2){
 			if(stage_conf->stage->x < 0){
 				stage_conf->stage->x += STAGE_VEL + SPEED* accel;
 				monster->monsterRect->x += STAGE_VEL + SPEED * accel;
 			}
-
 			else
 				if(sprite->x > 0)
 					sprite->x -= SPEED + STAGE_VEL* accel;
 		}else{
 			sprite->x -= SPEED + STAGE_VEL* accel;
 		}
-		SDL_Log("%d", stage_conf->stage->x);
-
 	}
 
-	if(right && !conf->battleState){
-		variacaoSprite++;
-		change(conf, monster,NULL);
+	if(flag == 4){  /// RIGTH
 		if(sprite->x > stage_conf->width/2){
 			if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x))){
 				stage_conf->stage->x -= STAGE_VEL + SPEED* accel;
@@ -195,81 +323,7 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 		}else{
 			sprite->x += SPEED + STAGE_VEL* accel;
 			variacaoRigth += SPEED + STAGE_VEL* accel;
-
 		}
-
 	}
-
-	if(conf->battleState){
-		if(conf->ready){
-			variacaoSprite++;
-			if(variacaoSprite % (TROCA + 5) == 0){
-				conf->numSprite++;
-				if(conf->numSprite > 4){
-					conf->numSprite = 4;
-
-				}
-				changeSprite(conf, sprite, 0);
-				return 1;
-			}
-		}else
-			battleConf(conf,stage_conf, monster);
-
-	}
-	return 0;
-	SDL_Delay(6);
-}
-
-void change(PlayerConf* player, MonsterInfo* monster,int flag){
-	int limit;
-
-	if(player->up || flag)
-		limit = 6;
-	else if(player->down || flag == 2)
-		limit = 8;
-	else if(player->rigth || flag == 3)
-		limit = 6;
-	else if(player->left || flag == 4)
-		limit = 6;
-
-	if(variacaoSprite % TROCA == 0){
-		player->numSprite++;
-		if(player->numSprite > limit)
-			player->numSprite = 1;
-		changeSprite(player,player->sprite,0);
-	}
-}
-
-int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
-
-	SDL_Rect aux; // retangulo auxiliar
-
-	//	SDL_Log("testando...");
-	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE){
-		if(!player->battleState)
-			player->numSprite = 0;
-		player->battleState = 1;
-		monster->battleState = 1;
-		//		SDL_Log("%d", player->numSprite);
-
-		return 1;
-	}
-	return 0;
-}
-
-int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
-	if(player->sprite->y > monster->monsterRect->y + (monster->monsterRect->h * 2) ){
-		player->numSprite = 1;
-		player->ready = 1;
-	}
-	else{
-		variacaoSprite++;
-		player->flag = 2;
-		change(player, monster,2);
-		player->sprite->y += SPEED + STAGE_VEL;
-
-	}
-
-
 	return 0;
 }

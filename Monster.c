@@ -35,8 +35,8 @@ void setupMonster(MonsterInfo* monster){
 	//Set Monster data
 	monster->monsterRect->w *= 3;
 	monster->monsterRect->h *= 3;
-	monster->monsterRect->x = 400;
-	monster->monsterRect->y = 200;
+	monster->monsterRect->x = monster->x;
+	monster->monsterRect->y = monster->y;
 	monster->battle = (MonsterBattle*) malloc(sizeof(MonsterBattle) * 50);
 	monster->battleState = 0;
 	SDL_Log("foi %s", SDL_GetError());
