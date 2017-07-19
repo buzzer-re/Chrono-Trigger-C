@@ -110,12 +110,7 @@ int main(int argc, char **argv) {
 	text->tex = &textTex;
 	text->color = &color;
 	text->textRect = &textRect;
-	/// battle options
-	options->render = &render;
-	options->surface = &textSurface;
-	options->tex = &battleOptionsTex;
-	options->textRect = &battleInfo;
-	options->color = &color;
+
 
 
 	if(!setupSprite(crono_conf, &crono))
@@ -151,11 +146,6 @@ int main(int argc, char **argv) {
 			SDL_RenderFillRect(render,&menu);
 			setText(crono_conf,text);
 			setupInfo(text,&menu);
-
-			//			setText(NULL, options);
-			//			battleSystem(&menu, crono_conf, options);
-			//			if(!battleSystem(&menu, crono_conf, options))
-			//				SDL_Log("%s", SDL_GetError());
 
 			SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 			SDL_RenderCopy(render, textTex, NULL, &textRect);
