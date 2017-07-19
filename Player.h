@@ -35,6 +35,7 @@ typedef struct player_info {
 	int x, y;
 	char *name;
 	char *FirstSprite;
+	char *textMenu;
 	int state;
 	int battleState, ready;
 	PlayerBattle* battle;
@@ -49,8 +50,6 @@ int setupSprite(PlayerConf*,SDL_Rect*);
 void changeSprite(PlayerConf*,SDL_Rect*,int);
 
 void battleState(PlayerConf*,MonsterInfo*);
-
-
 
 void drawCollision(PlayerConf*);
 #endif /* PLAYER_H_ */

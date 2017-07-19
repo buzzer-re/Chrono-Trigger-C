@@ -15,13 +15,18 @@ typedef struct text_info{
 	SDL_Renderer** render;
 	SDL_Surface** surface;
 	SDL_Texture** tex;
-	TTF_Font** font;
+	TTF_Font* font;
 	SDL_Color* color;
 	SDL_Rect* textRect;
-
 	char* text;
 }Text;
 
-void menuPlayer(PlayerConf*,MonsterInfo*,SDL_Rect*,int,int,Text*);
+void menuPlayer(SDL_Rect*,int,int,int);
+
+int setText(PlayerConf*,Text*);
+
+void setupInfo(Text*,SDL_Rect*);
+
+int battleSystem(SDL_Rect*,PlayerConf*,Text*);
 
 #endif

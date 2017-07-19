@@ -25,7 +25,8 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 	char* path;
 	variacaoSprite = 0;
 	variacaoRigth = 0;
-	if(!strcmp(conf->name,"crono") && conf->start != 1){
+	conf->textMenu = malloc(sizeof(char) * 255);
+	if(!strcmp(conf->name,"Crono") && conf->start != 1){
 		path = "Resourcers/cronoNormal1.png";
 		conf->pathSprite = malloc(sizeof(char) * 40);
 
@@ -70,7 +71,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
  */
 
 	if(reset){
-		if(!strcmp(conf->name,"crono")){
+		if(!strcmp(conf->name,"Crono")){
 			switch(conf->state){
 			case 1: *conf->surface = IMG_Load("Resourcers/cronoNormal1.png");break;
 			case 2: *conf->surface = IMG_Load("Resourcers/cronoNormalLeft1.png");break;
