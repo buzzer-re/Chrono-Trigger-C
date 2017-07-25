@@ -57,7 +57,11 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 	conf->battle->mp = 120;
 	conf->battle->atk = 15;
 	conf->battle->def = 20;
-
+	conf->battle->ataque = 0;
+	conf->run = 0;
+	conf->battle->readyAtaque = 0;
+	conf->battle->contadorAtaque = 0;
+//	conf->battle->ataqueNormal = 0;
 	return 1;
 }
 
@@ -81,7 +85,6 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		}
 	}else{
 
-
 		if(conf->up)
 			sprintf(conf->pathSprite, "%s%d%s", "Resourcers/cronoWalkFront",conf->numSprite, ".png");
 
@@ -94,14 +97,26 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		if(conf->down || conf->flag == 2)
 			sprintf(conf->pathSprite, "%s%d%s", "Resourcers/cronoWalkDown", conf->numSprite, ".png");
 
+		if(conf->up && conf->run)
+			sprintf(conf->pathSprite,"%s%d%s","Resourcers/CronoRunFront-", conf->numSprite, ".png");
 		//battle mode
 
-		if(conf->battleState && conf->state && conf->ready)
+
+		if(conf->battleState && conf->state && conf->ready && conf->battle->ataqueNormal != 1)
 			sprintf(conf->pathSprite, "%s%d%s","Resourcers/battle",conf->numSprite,".png");
 
-		else if(conf->battleState && conf->state == 2 && conf->ready)
-			sprintf(conf->pathSprite,"%s%d%s","Resourcers/battleLeft",conf->numSprite,".png");
+//		else if(conf->battleState && conf->state == 2 && conf->ready && conf->battle->ataqueNormal != 1)
+//			sprintf(conf->pathSprite,"%s%d%s","Resourcers/battleLeft",conf->numSprite,".png");
 
+		///Battle sprites
+		if(conf->battle->ataqueNormal == 1 && conf->state && conf->battle->readyAtaque){
+			sprintf(conf->pathSprite,"%s%d%s","Resourcers/cronoAtaqueNormal",conf->numSprite,".png");
+			SDL_Log("to aqui ó -> %s", conf->pathSprite);
+		}
+
+		else if(conf->battleState && conf->battle->adjust == 1 && conf->state){
+			sprintf(conf->pathSprite,"%s","Resourcers/cronoAtaqueBack.png");
+		}
 
 		*conf->surface = IMG_Load(conf->pathSprite);
 	}

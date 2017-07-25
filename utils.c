@@ -18,3 +18,22 @@ void initScreen(SDL_Window** window, SDL_Renderer** render,int width, int heigth
 		exit(1);
 	}
 }
+
+/// function to set any type of image, passing struct Element.
+void setElement(Element* element){
+	*element->surface = IMG_Load(element->path);
+	if(!*element->surface)
+	{
+		SDL_Log("Error in open surface %s", SDL_GetError());
+	}
+
+	*element->text = SDL_CreateTextureFromSurface(*element->render, *element->surface);
+	if(!*element->text)
+	{
+		SDL_Log("Error in create texture! %s ", SDL_GetError());
+	}
+	SDL_QueryTexture(*element->text, NULL, NULL, &element->rect->w, &element->rect->y);
+	SDL_FreeSurface(*element->surface);
+
+	SDL_Log("Element created!");
+}

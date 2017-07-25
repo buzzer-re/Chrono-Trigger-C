@@ -1,4 +1,5 @@
-Move.o: ../Move.c ../Move.h ../Stage.h ../Player.h ../Monster.h
+Move.o: ../Move.c ../Move.h ../Stage.h ../Player.h ../Monster.h \
+ ../utils.h
 
 ../Move.h:
 
@@ -7,3 +8,5 @@ Move.o: ../Move.c ../Move.h ../Stage.h ../Player.h ../Monster.h
 ../Player.h:
 
 ../Monster.h:
+
+../utils.h:

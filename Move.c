@@ -6,6 +6,7 @@
  */
 #include "Move.h"
 #include "Stage.h"
+
 #include "Monster.h"
 #include <string.h>
 
@@ -22,8 +23,9 @@
 /// TODO Iniciar sistema de encontro para batalha
 
 int accel = 1;
-
-int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInfo* monster)
+int num = 1;
+int contDown = 1, contUp = 1;
+int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,MonsterInfo* monster,Element* cursor)
 {
 	/*
 	 * 	flag 1 -> crono
@@ -42,8 +44,9 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 			case SDL_SCANCODE_UP:
 				if(!conf->battleState){
 					conf->up = 1;
-					up = 1;
+
 				}
+				up = 1;
 				break;
 			case SDL_SCANCODE_LEFT:
 				if(!conf->battleState){
@@ -60,11 +63,12 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 			case SDL_SCANCODE_DOWN:
 				if(!conf->battleState){
 					conf->down = 1;
-					down = 1;
+
 				}
+				down = 1;
 				break;
 			case SDL_SCANCODE_Q:
-				*run = 0;
+				*isGame = 0;
 				break;
 			case SDL_SCANCODE_K:
 				if(!conf->battleState){
@@ -77,18 +81,26 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 				else
 					conf->battleState = 1;
 				break;
+			case SDL_SCANCODE_Z:
+				run = 1;
+				accel = 2;
+				conf->run = 1;
+				break;
+			case SDL_SCANCODE_H:
+				conf->battle->ataqueNormal = 1;
+				break;
 			}break;
 			case SDL_KEYUP:
 				switch(event.key.keysym.scancode){
 				case SDL_SCANCODE_UP:
 					if(!conf->battleState){
-						up = 0;
+
 						conf->up = 0;
 						conf->numSprite =0;
 						conf->state = 1;
 						changeSprite(conf, sprite, 1);
 					}
-
+					up = 0;
 					break;
 				case SDL_SCANCODE_LEFT:
 					if(!conf->battleState){
@@ -114,33 +126,69 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 						conf->numSprite = 0;
 						conf->state = 4;
 						changeSprite(conf, sprite, 1);
-						down = 0;
+
 					}
+					down = 0;
 					break;
 				case SDL_SCANCODE_K:
 					accel = 1;
 					break;
+				case SDL_SCANCODE_Z:
+					run = 0;
+					accel = 1;
+					conf->run = 0;
 				}break;
 		}
 	}
+	///Menu Cursor
 
+	if(up && conf->battleState){
+		contUp++;
+		if(contUp > 0 && contUp <= 3){
+			switch(contUp){
+			case 1: cursor->rect->y = cursor->y;break;
+			case 2: cursor->rect->y = cursor->y/5 + cursor->height * 3;break;
+			case 3: cursor->rect->y = cursor->y + cursor->height/3;break;
+			}
+			SDL_Delay(50);
+		}else
+			contUp = 0;
+
+		SDL_Log("UP -> %d", contUp);
+	}
+
+	if(down && conf->battleState){
+		contDown++;
+		if(contDown > 0 && contDown <= 3){
+			switch(contDown){
+			case 1: cursor->rect->y = cursor->y + cursor->height/3;break;
+			case 2: cursor->rect->y = cursor->y/5 + cursor->height * 3;break;
+			case 3: cursor->rect->y = cursor->y;break;
+			}
+			SDL_Delay(50);
+		}else
+			contDown = 0;
+		SDL_Log("Down -> %d", contDown);
+	}
+
+	/// end menu cursor
 	if(up && !conf->battleState){
 		variacaoSprite++;
-		change(conf, monster,NULL);
+		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster,1);
 		SDL_Log("%d", sprite->y);
 	}
 
 	if((down && !conf->battleState)){
 		variacaoSprite++;
-		change(conf, monster,NULL);
+		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster,2);
 		SDL_Log("%d", sprite->y);
 	}
 
 	if(left && !conf->battleState){
 		variacaoSprite++;
-		change(conf, monster,NULL);
+		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster, 3);
 		SDL_Log("%d", stage_conf->stage->x);
 
@@ -148,27 +196,34 @@ int move(SDL_Rect* sprite,int* run,PlayerConf* conf,STAGE* stage_conf,MonsterInf
 
 	if(right && !conf->battleState){
 		variacaoSprite++;
-		change(conf, monster,NULL);
+		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster, 4);
 	}
 
 	if(conf->battleState){
 		if(conf->ready){
 			variacaoSprite++;
-			change(conf, monster,NULL);
+			change(conf, monster,stage_conf,NULL);
 			return 1;
 		}else
 			battleConf(conf,stage_conf, monster);
 	}
 
-	//	SDL_Delay(6);
 	SDL_Log("Battle -> %d", conf->battleState);
 	return 0;
 }
 
 int getTroca(PlayerConf* player){
+	if(player->battle->ataqueNormal && !player->up){
+		return 25;
+	}
+
+
+	if(player->run)
+		return 6;
+
 	if(player->ready)
-			return 9;
+		return 9;
 
 	if(up || down || player->flag || player->flag == 2){
 		if(player->battleState)
@@ -183,7 +238,7 @@ int getTroca(PlayerConf* player){
 	return 6;
 }
 
-void change(PlayerConf* player, MonsterInfo* monster,int flag){
+void change(PlayerConf* player, MonsterInfo* monster,STAGE* stage,int flag){
 	int limit;
 	int initialFantasy = 1;
 
@@ -195,16 +250,43 @@ void change(PlayerConf* player, MonsterInfo* monster,int flag){
 		limit = 6;
 	if(player->left || player->flag == 4)
 		limit = 6;
-	if(player->ready){
-		limit = 4;
-		initialFantasy = 4;
+	if(player->ready && !player->up){
+		limit = 5;
+		initialFantasy = 5;
 	}
-	SDL_Log("Variacao -> %d", getTroca(player));
+
+	if(player->run)
+		limit = 7;
+
+	if(player->flag == 6){
+		limit = 2;
+		initialFantasy = 1;
+		variacaoSprite++;
+	}
+
+
+	//	SDL_Log("Limit = %d Variacao -> %d",limit, getTroca(player));
+	//	SDL_Log("Ataque -> %d", player->battle->contadorAtaque);
+	SDL_Log("Num - %d", player->numSprite);
+	//	SDL_Delay(100);
 	if(variacaoSprite % getTroca(player) == 0){
 		player->numSprite++;
-		if(player->numSprite > limit)
+		if(player->numSprite > limit){
 			player->numSprite = initialFantasy;
+		}
+		if(player->flag == 6)
+			player->battle->contadorAtaque++;
+
+		if(player->battle->contadorAtaque > 2){
+			player->battle->ataqueNormal = 0;
+			player->battle->adjust = 1;
+			player->battle->contadorAtaque = 0;
+			player->battle->readyAtaque = 0;
+			accel = 2;
+		}
+
 		changeSprite(player,player->sprite,0);
+
 	}
 }
 
@@ -213,9 +295,10 @@ int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 	SDL_Rect aux;
 
 	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE){
-		if(!player->battleState)
+		if(!player->battleState){
 			player->numSprite = 0;
 
+		}
 		player->battleState = 1;
 		monster->battleState = 1;
 		return 1;
@@ -228,27 +311,34 @@ int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 		variacaoSprite++;
 		if(player->sprite->x < monster->monsterRect->x){
 			player->rigth = 1;
-			change(player, monster,4);
+			change(player, monster,stage,4);
 			cameraAdjust(stage,  player->sprite, monster, 4);
 		}
 		else{
 			player->flag = 3;
 			player->left = 1;
-			change(player, monster,3);
+			change(player, monster,stage,3);
 			cameraAdjust(stage,  player->sprite, monster, 3);
 		}
 	}
 
 	else if(player->sprite->y > monster->monsterRect->y + (monster->monsterRect->h * 2) ){
 		player->numSprite = 1;
-		player->ready = 1;
+
+		if(player->battle->adjust != 1)
+			player->ready = 1;
 		player->flag = 10;
+		player->up = 0;
+		player->left = 0;
+		player->rigth= 0;
+		player->down = 0;
+		player->battle->adjust = 0;
 	}
 	else{
 		variacaoSprite++;
 		player->flag = 2;
 		cameraAdjust(stage, player->sprite, monster,2);
-		change(player, monster, NULL);
+		change(player, monster,stage, NULL);
 	}
 
 
@@ -269,60 +359,60 @@ int cameraAdjust(STAGE* stage_conf, SDL_Rect* sprite,MonsterInfo* monster, int f
 	if(flag == 1){ // UP
 		if(sprite->y < stage_conf->heigth/2){
 			if(stage_conf->stage->y < 1){
-				stage_conf->stage->y += STAGE_VEL + SPEED * accel;
-				monster->monsterRect->y += STAGE_VEL + SPEED * accel;
+				stage_conf->stage->y += (SPEED + STAGE_VEL) * accel;
+				monster->monsterRect->y += (SPEED + STAGE_VEL) * accel;
 			}
 			else{
 				if(sprite->y > 0)
-					sprite->y -= SPEED + STAGE_VEL * accel;
+					sprite->y -= (SPEED + STAGE_VEL) * accel;
 			}
 		}else
-			sprite->y -= SPEED + STAGE_VEL * accel;
+			sprite->y -= (SPEED + STAGE_VEL) * accel;
 	}
 
 
 	if(flag == 2){  // DOWN
 		if(sprite->y > stage_conf->heigth/2){
 			if(stage_conf->stage->y > stage_conf->limitY){
-				stage_conf->stage->y -= STAGE_VEL + SPEED * accel;
-				monster->monsterRect->y -= STAGE_VEL + SPEED * accel;
+				stage_conf->stage->y -= (SPEED + STAGE_VEL) * accel;
+				monster->monsterRect->y -= (SPEED + STAGE_VEL) * accel;
 			}
 			else
 				if(sprite->y < stage_conf->heigth - sprite->h)
-					sprite->y += SPEED + STAGE_VEL* accel;
+					sprite->y += (SPEED + STAGE_VEL)* accel;
 		}else{
-			sprite->y += SPEED + STAGE_VEL * accel;
+			sprite->y += (SPEED + STAGE_VEL) * accel;
 		}
 	}
 
 	if(flag == 3){ // left
 		if(sprite->x < stage_conf->width/2){
 			if(stage_conf->stage->x < 0){
-				stage_conf->stage->x += STAGE_VEL + SPEED* accel;
-				monster->monsterRect->x += STAGE_VEL + SPEED * accel;
+				stage_conf->stage->x += (SPEED + STAGE_VEL)* accel;
+				monster->monsterRect->x += (SPEED + STAGE_VEL) * accel;
 			}
 			else
 				if(sprite->x > 0)
-					sprite->x -= SPEED + STAGE_VEL* accel;
+					sprite->x -= (SPEED + STAGE_VEL)* accel;
 		}else{
-			sprite->x -= SPEED + STAGE_VEL* accel;
+			sprite->x -= (SPEED + STAGE_VEL)* accel;
 		}
 	}
 
 	if(flag == 4){  /// RIGTH
 		if(sprite->x > stage_conf->width/2){
 			if(stage_conf->limitX + MARGEM_ERRO <= ((stage_conf->stage->w + stage_conf->stage->x))){
-				stage_conf->stage->x -= STAGE_VEL + SPEED* accel;
-				monster->monsterRect->x -= STAGE_VEL + SPEED * accel;
+				stage_conf->stage->x -= (SPEED + STAGE_VEL)* accel;
+				monster->monsterRect->x -= (SPEED + STAGE_VEL) * accel;
 			}
 
 			else{
 				if(sprite->x < stage_conf->width - sprite->w)
-					sprite->x += SPEED + STAGE_VEL* accel;
+					sprite->x += (SPEED + STAGE_VEL)* accel;
 			}
 		}else{
-			sprite->x += SPEED + STAGE_VEL* accel;
-			variacaoRigth += SPEED + STAGE_VEL* accel;
+			sprite->x += (SPEED + STAGE_VEL)* accel;
+			variacaoRigth += (SPEED + STAGE_VEL)* accel;
 		}
 	}
 	return 0;

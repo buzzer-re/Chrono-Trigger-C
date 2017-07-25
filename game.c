@@ -41,13 +41,13 @@ int main(int argc, char **argv) {
 
 	int battle = 0;
 	int contMusica = 1;
-
+	int contSetup = 0;
 
 	if(Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 		SDL_Log("%s", SDL_GetError());
 
 	Mix_Music* bgm = Mix_LoadMUS("Sounds/black.mp3");
-	Mix_Music* battleSong = Mix_LoadMUS("Sounds/battle1.mp3");
+	Mix_Music* battleSong = Mix_LoadMUS("Sounds/crossBoss.mp3");
 
 	SDL_Window* window;
 	SDL_Renderer* render;
@@ -96,22 +96,38 @@ int main(int argc, char **argv) {
 	setupMonster(monster);
 
 	SDL_Rect menu;
+	SDL_Rect optionsRect;
 	Text* text = (Text*) malloc(sizeof(Text) * 50);
 	Text* options = (Text*) malloc(sizeof(Text) * 50);
 	text->font = TTF_OpenFont("Resourcers/Chrono.ttf", 35);
 	SDL_Color color = {255,255,255};
 	SDL_Surface* textSurface;
 	SDL_Texture* textTex;
-	SDL_Texture* battleOptionsTex;
 	SDL_Rect textRect;
-	SDL_Rect battleInfo;
 	text->render = &render;
 	text->surface = &textSurface;
 	text->tex = &textTex;
 	text->color = &color;
 	text->textRect = &textRect;
 
+	options->font = text->font;
+	options->render = &render;
+	options->surface = &textSurface;
+	options->tex = &textTex;
+	options->color = &color;
+	options->textRect = &optionsRect;
+	options->text = malloc(sizeof(char) * 50);
 
+	/// Menu
+	SDL_Rect optionBox;
+	SDL_Texture* cursorTex;
+	Element* cursor = (Element*) malloc(sizeof(Element) * 50);
+	cursor->render = &render;
+	cursor->surface = &surface;
+	cursor->rect =  &optionBox;
+	cursor->path = "Resourcers/cursor.png";
+	cursor->text = &cursorTex;
+	setElement(cursor);
 
 	if(!setupSprite(crono_conf, &crono))
 	{
@@ -136,7 +152,7 @@ int main(int argc, char **argv) {
 		moveMonster(monster);
 		collisionCheck(crono_conf, &stage_conf, monster);
 
-		if(move(&crono,&run,crono_conf,&stage_conf,monster)){
+		if(move(&crono,&run,crono_conf,&stage_conf,monster,cursor)){
 			if(!battle){
 				Mix_PlayMusic(battleSong, -1);
 				battle = 1;
@@ -144,14 +160,18 @@ int main(int argc, char **argv) {
 			SDL_SetRenderDrawColor(render, 1, 1, 71, 255);
 			menuPlayer(&menu, WIDTH_SCREEN, HEIGH_SCREEN,1);
 			SDL_RenderFillRect(render,&menu);
-			setText(crono_conf,text);
+			setText(crono_conf,text,0);
 			setupInfo(text,&menu);
-
 			SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 			SDL_RenderCopy(render, textTex, NULL, &textRect);
+			battleSystem(&menu, crono_conf, monster, &stage_conf, options);
+			setText(crono_conf,options,1);
+			setupOptions(text, &menu,cursor);
+			SDL_RenderCopy(render, textTex, NULL, &textRect);
+			SDL_RenderCopy(render, cursorTex, NULL, &optionBox);
 		}
-		SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 
+		SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 		SDL_RenderPresent(render);
 		SDL_Delay(FPS);
 
@@ -160,15 +180,16 @@ int main(int argc, char **argv) {
 	Mix_Quit();
 	Mix_FreeMusic(bgm);
 	Mix_FreeMusic(battleSong);
-	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(render);
+	SDL_DestroyWindow(window);
+
 	SDL_Quit();
 	TTF_Quit();
-	free(crono_conf->battle);
-	free(crono_conf);
-	free(monster->battle);
-	free(monster);
-	free(text);
-	//	free(&menu);
+//	free(crono_conf->battle);
+//	free(crono_conf);
+//	free(monster->battle);
+//	free(monster);
+//	free(text);
+
 	return 1;
 }

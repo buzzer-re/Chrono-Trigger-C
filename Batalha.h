@@ -6,6 +6,7 @@
  */
 #include "Player.h"
 #include "Monster.h"
+#include "utils.h"
 
 #include <SDL2/SDL_ttf.h>
 #ifndef BATALHA_H_
@@ -21,12 +22,18 @@ typedef struct text_info{
 	char* text;
 }Text;
 
+//int contadorAtaque;
+
+int readyAtaque;
+
 void menuPlayer(SDL_Rect*,int,int,int);
 
-int setText(PlayerConf*,Text*);
+int setText(PlayerConf*,Text*,int);
 
 void setupInfo(Text*,SDL_Rect*);
 
-int battleSystem(SDL_Rect*,PlayerConf*,Text*);
+void setupOptions(Text*,SDL_Rect*,Element*);
+
+int battleSystem(SDL_Rect*,PlayerConf*,MonsterInfo*,STAGE*,Text*);
 
 #endif

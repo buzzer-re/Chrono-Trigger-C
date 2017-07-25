@@ -21,6 +21,8 @@ typedef struct player_battle{
 	int atk, def;
 	int exp;
 	int critical;
+	int ataque, ataqueNormal, readyAtaque, contadorAtaque;
+	int adjust;
 }PlayerBattle;
 
 typedef struct player_info {
@@ -31,13 +33,14 @@ typedef struct player_info {
 	char *pathSprite;
 	int start;
 	int numSprite;
-	int up, down, left, rigth,flag;
+	int up, down, left, rigth,flag,run;
 	int x, y;
 	char *name;
 	char *FirstSprite;
 	char *textMenu;
 	int state;
 	int battleState, ready;
+
 	PlayerBattle* battle;
 }PlayerConf;
 

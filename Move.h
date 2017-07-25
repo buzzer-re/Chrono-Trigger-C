@@ -17,17 +17,18 @@
 #include "Stage.h"
 #include "Player.h"
 #include "Monster.h"
+#include "utils.h"
 
-int up, down, left, right;
+int up, down, left, right,run;
 int variacaoSprite;
 int variacaoRigth;
 
 
-int move(SDL_Rect* ,int* ,PlayerConf* ,STAGE* ,MonsterInfo*);
+int move(SDL_Rect* ,int* ,PlayerConf* ,STAGE* ,MonsterInfo*,Element*);
 
 int collisionCheck(PlayerConf*,STAGE*,MonsterInfo*);
 
-void change(PlayerConf*, MonsterInfo*,int);
+void change(PlayerConf*, MonsterInfo*,STAGE*,int);
 
 int battleConf(PlayerConf*,STAGE*,MonsterInfo*);
 #endif /* MOVE_H_ */
