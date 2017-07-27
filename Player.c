@@ -55,9 +55,11 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 	conf->battle = (PlayerBattle*) malloc(sizeof(PlayerBattle) * 50);
 	conf->battle->hp = 100;
 	conf->battle->mp = 120;
-	conf->battle->atk = 15;
+	conf->battle->atk = 5;
+	conf->battle->critical = 0;
 	conf->battle->def = 20;
 	conf->battle->ataque = 0;
+	conf->battle->level = 1;
 	conf->run = 0;
 	conf->battle->readyAtaque = 0;
 	conf->battle->contadorAtaque = 0;
@@ -111,7 +113,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		///Battle sprites
 		if(conf->battle->ataqueNormal == 1 && conf->state && conf->battle->readyAtaque){
 			sprintf(conf->pathSprite,"%s%d%s","Resourcers/cronoAtaqueNormal",conf->numSprite,".png");
-			SDL_Log("to aqui ó -> %s", conf->pathSprite);
+//			SDL_Log("to aqui ó -> %s", conf->pathSprite);
 		}
 
 		else if(conf->battleState && conf->battle->adjust == 1 && conf->state){

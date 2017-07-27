@@ -19,12 +19,15 @@
 #define STAGE_VEL 1
 #define MARGEM_ERRO 10
 
-
-/// TODO Iniciar sistema de encontro para batalha
-
+/// Global
 int accel = 1;
 int num = 1;
-int contDown = 1, contUp = 1;
+int contDown = 0, contUp = 0;
+int action = 0;
+int ataque_normal;
+int tecnica;
+int item;
+
 int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,MonsterInfo* monster,Element* cursor)
 {
 	/*
@@ -32,13 +35,21 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 	 * 	flag 2 -> marle
 	 * 	flag 3 -> lucca
 	 * */
+	/// Menu Options
+	ataque_normal = cursor->y;
+	tecnica = cursor->y + cursor->height/3;
+	item = cursor->y/5 + cursor->height * 3;
+	//End menu options
+
 	SDL_Event event;
+
 	if(variacaoSprite > 2000)
 		variacaoSprite = 0;
 
 	while(SDL_PollEvent(&event) != 0)
 	{
 		switch(event.type){
+		case SDL_QUIT: *isGame = 0; break;
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.scancode){
 			case SDL_SCANCODE_UP:
@@ -86,8 +97,9 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 				accel = 2;
 				conf->run = 1;
 				break;
-			case SDL_SCANCODE_H:
-				conf->battle->ataqueNormal = 1;
+			case SDL_SCANCODE_X:
+				if(conf->battleState)
+					action = 1;
 				break;
 			}break;
 			case SDL_KEYUP:
@@ -136,10 +148,16 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 				case SDL_SCANCODE_Z:
 					run = 0;
 					accel = 1;
-					conf->run = 0;
+					conf->run = 0;break;
+				case SDL_SCANCODE_X:
+					if(conf->battleState)
+						action = 0;break;
 				}break;
 		}
 	}
+	/// velocity
+		if(!conf->battleState) accel = 1;
+	///
 	///Menu Cursor
 
 	if(up && conf->battleState){
@@ -168,29 +186,44 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 			SDL_Delay(50);
 		}else
 			contDown = 0;
-		SDL_Log("Down -> %d", contDown);
+//		SDL_Log("Down -> %d", contDown);
 	}
 
 	/// end menu cursor
+
+	//Actions in battle
+	if(action){
+		if(cursor->rect->y == ataque_normal) // Se o cursor estiver na posição do ataque normal
+			conf->battle->ataqueNormal = 1;
+		if(cursor->rect->y == tecnica){
+			//TODO
+		}
+
+		if(cursor->rect->y == item){
+			//TODO
+		}
+	}
+
+	//end actions in battle
 	if(up && !conf->battleState){
 		variacaoSprite++;
 		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster,1);
-		SDL_Log("%d", sprite->y);
+//		SDL_Log("%d", sprite->y);
 	}
 
 	if((down && !conf->battleState)){
 		variacaoSprite++;
 		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster,2);
-		SDL_Log("%d", sprite->y);
+//		SDL_Log("%d", sprite->y);
 	}
 
 	if(left && !conf->battleState){
 		variacaoSprite++;
 		change(conf, monster,stage_conf,NULL);
 		cameraAdjust(stage_conf, sprite, monster, 3);
-		SDL_Log("%d", stage_conf->stage->x);
+//		SDL_Log("%d", stage_conf->stage->x);
 
 	}
 
@@ -209,12 +242,12 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 			battleConf(conf,stage_conf, monster);
 	}
 
-	SDL_Log("Battle -> %d", conf->battleState);
+//	SDL_Log("Battle -> %d", conf->battleState);
 	return 0;
 }
 
 int getTroca(PlayerConf* player){
-	if(player->battle->ataqueNormal && !player->up){
+	if(player->battle->ataqueNormal == 1 && !player->up){
 		return 25;
 	}
 
@@ -263,12 +296,6 @@ void change(PlayerConf* player, MonsterInfo* monster,STAGE* stage,int flag){
 		initialFantasy = 1;
 		variacaoSprite++;
 	}
-
-
-	//	SDL_Log("Limit = %d Variacao -> %d",limit, getTroca(player));
-	//	SDL_Log("Ataque -> %d", player->battle->contadorAtaque);
-	SDL_Log("Num - %d", player->numSprite);
-	//	SDL_Delay(100);
 	if(variacaoSprite % getTroca(player) == 0){
 		player->numSprite++;
 		if(player->numSprite > limit){
@@ -294,7 +321,7 @@ int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 
 	SDL_Rect aux;
 
-	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE){
+	if(SDL_IntersectRect(player->sprite, monster->monsterRect, &aux) == SDL_TRUE && !monster->battle->isDead){
 		if(!player->battleState){
 			player->numSprite = 0;
 

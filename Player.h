@@ -20,6 +20,7 @@ typedef struct player_battle{
 	int hp, mp;
 	int atk, def;
 	int exp;
+	int level;
 	int critical;
 	int ataque, ataqueNormal, readyAtaque, contadorAtaque;
 	int adjust;

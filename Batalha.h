@@ -8,6 +8,7 @@
 #include "Monster.h"
 #include "utils.h"
 
+#include <time.h>
 #include <SDL2/SDL_ttf.h>
 #ifndef BATALHA_H_
 #define BATALHA_H_
@@ -35,5 +36,7 @@ void setupInfo(Text*,SDL_Rect*);
 void setupOptions(Text*,SDL_Rect*,Element*);
 
 int battleSystem(SDL_Rect*,PlayerConf*,MonsterInfo*,STAGE*,Text*);
+
+int calculateHit(PlayerConf*);
 
 #endif

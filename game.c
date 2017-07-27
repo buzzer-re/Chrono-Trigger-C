@@ -145,11 +145,12 @@ int main(int argc, char **argv) {
 		SDL_RenderClear(render);
 		SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 		SDL_RenderCopy(render, texturaStage, NULL, &stageRect);
-		SDL_RenderCopy(render,monsterTex,NULL,&monsterRect);
+		if(!monster->battle->isDead){
+			SDL_RenderCopy(render,monsterTex,NULL,&monsterRect);
+			moveMonster(monster);
+		}
 		SDL_RenderCopy(render, tex, NULL, &crono);
 
-		//		SDL_RenderDrawRect(render, &textRect);
-		moveMonster(monster);
 		collisionCheck(crono_conf, &stage_conf, monster);
 
 		if(move(&crono,&run,crono_conf,&stage_conf,monster,cursor)){
@@ -167,8 +168,13 @@ int main(int argc, char **argv) {
 			battleSystem(&menu, crono_conf, monster, &stage_conf, options);
 			setText(crono_conf,options,1);
 			setupOptions(text, &menu,cursor);
-			SDL_RenderCopy(render, textTex, NULL, &textRect);
-			SDL_RenderCopy(render, cursorTex, NULL, &optionBox);
+			if(crono_conf->battle->ataqueNormal != 1){
+				SDL_RenderCopy(render, textTex, NULL, &textRect);
+				SDL_RenderCopy(render, cursorTex, NULL, &optionBox);
+			}
+		}else{
+			if(battle) Mix_PlayMusic(bgm,-1);
+			battle = 0;
 		}
 
 		SDL_SetRenderDrawColor(render,255, 255, 255, 255);
@@ -177,19 +183,16 @@ int main(int argc, char **argv) {
 
 	}
 
-	Mix_Quit();
 	Mix_FreeMusic(bgm);
 	Mix_FreeMusic(battleSong);
+	Mix_Quit();
 	SDL_DestroyRenderer(render);
 	SDL_DestroyWindow(window);
-
 	SDL_Quit();
 	TTF_Quit();
-//	free(crono_conf->battle);
-//	free(crono_conf);
-//	free(monster->battle);
-//	free(monster);
-//	free(text);
-
+	//	free(crono_conf->battle);
+	//	free(crono_conf->pathSprite);
+	//	free(crono_conf->name);
+	//	free(crono_conf);
 	return 1;
 }

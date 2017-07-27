@@ -17,6 +17,7 @@ typedef struct monsterBattle{
 	int hp, mp;
 	int atk, def;
 	int critical;
+	int isDead;
 }MonsterBattle;
 
 typedef struct monster_info{

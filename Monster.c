@@ -39,6 +39,8 @@ void setupMonster(MonsterInfo* monster){
 	monster->monsterRect->y = monster->y;
 	monster->battle = (MonsterBattle*) malloc(sizeof(MonsterBattle) * 50);
 	monster->battleState = 0;
+	monster->battle->hp = 100;
+	monster->battle->isDead = 0;
 	SDL_Log("foi %s", SDL_GetError());
 
 }

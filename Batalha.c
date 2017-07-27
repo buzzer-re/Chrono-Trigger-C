@@ -30,18 +30,17 @@ int setText(PlayerConf* player ,Text* text,int flag){
 		sprintf(player->textMenu,"%s\n%s%d\n%s%d",player->name,"HP: ",player->battle->hp,"MP: ",player->battle->mp);
 		*text->surface = TTF_RenderText_Blended_Wrapped(text->font, player->textMenu, *text->color, 120);
 	}else if(flag){
-		SDL_Log("aqui ó");
 		sprintf(text->text,"%s\n%s\n%s", "Ataque", "Tecnica","Itens");
 		*text->surface = TTF_RenderText_Blended_Wrapped(text->font, text->text, *text->color, 120);
 	}
 
-	SDL_Log("surface %s", TTF_GetError());
+//	SDL_Log("surface %s", TTF_GetError());
 
 	if(!*text->surface)
 		return 0;
 
 	*text->tex = SDL_CreateTextureFromSurface(*text->render, *text->surface);
-	SDL_Log(" text %s", TTF_GetError());
+//	SDL_Log(" text %s", TTF_GetError());
 
 	if(!*text->tex)
 		return 0;
@@ -50,7 +49,7 @@ int setText(PlayerConf* player ,Text* text,int flag){
 
 	SDL_FreeSurface(*text->surface);
 
-	SDL_Log("%s", TTF_GetError());
+//	SDL_Log("%s", TTF_GetError());
 	return 1;
 }
 
@@ -77,14 +76,46 @@ int battleSystem(SDL_Rect* menu,PlayerConf* player,MonsterInfo* monster,STAGE* s
 			player->up = 0;
 			player->battle->readyAtaque = 1;
 			change(player, monster,stage, NULL);
+			contadorAtaque = 0;
 		}
 	}
-	if(player->battle->adjust == 1)
+	if(player->battle->adjust == 1){
 		battleConf(player, stage, monster);
+		if(!contadorAtaque){
+			int hit = calculateHit(player);
+			SDL_Log("Hit -> %d", hit);
+			monster->battle->hp -=   hit ;//calculateHit(player);
+			SDL_Log("Vida monstro -> %d ", monster->battle->hp);
+			contadorAtaque = 1;
+		}
+	}
+
+	if(monster->battle->hp <= 0 && player->battle->adjust != 1){
+		player->ready = 0;
+		player->battleState = 0;
+		monster->battle->hp = 100;
+		monster->battleState = 0;
+//		player->up = 1
+		monster->battle->isDead = 1;
+		player->state = 1;
+		changeSprite(player,player->sprite,1);
+
+	}
 
 	return 0;
 }
 
+int calculateHit(PlayerConf* player){
+	srand(time(NULL));
+	int dano;
+	int dado = (rand() % 6) + 1;
+	if(!player->battle->critical)
+		dano = (player->battle->atk * dado);
+	else
+		dano = (player->battle->atk * (dado*2));
+
+	return dano;
+}
 void setupOptions(Text* text, SDL_Rect* menu,Element* choose){
 	text->textRect->w = (menu->w)/6;
 	text->textRect->h = (menu->h) ;
