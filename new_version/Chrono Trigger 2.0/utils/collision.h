@@ -3,7 +3,7 @@
 #ifndef _COLLISION_H
 #define _COLLISION_H
 
-int collisionMonster(SDL_Rect*, SDL_Rect*);
+int collision_check(SDL_Rect*, SDL_Rect*);
 
 
 

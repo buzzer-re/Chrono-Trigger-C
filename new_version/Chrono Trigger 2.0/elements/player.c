@@ -15,15 +15,28 @@ int set_sprite(Player* sprite, int flag)
 	if(!flag)
 		*sprite->surface = IMG_Load(sprite->sprite_img);
 	
-	else if(flag && !sprite->action)
+	else if(flag && !sprite->action && !sprite->battle.inBattle)
 	{	
-		switch(sprite->state)	
+		if(!sprite->battle.inBattle)
 		{
-			case 1:	sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"Normal1.png");break;
-			case 2: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalLeft1.png");break;
-			case 3: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalRight1.png");break;
-			case 4: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalDown1.png");break;
-		}	
+			switch(sprite->state)	
+			{
+				case 1:	sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"Normal1.png");break;
+				case 2: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalLeft1.png");break;
+				case 3: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalRight1.png");break;
+				case 4: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalDown1.png");break;
+			}	
+		}
+		else
+		{
+			switch(sprite->state)
+			{
+				case 1:	sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"BattleFront1.png");break;
+				case 2: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"BattleFront4.png");break;
+				case 3: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalRight1.png");break;
+				case 4: sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"NormalDown1.png");break;
+			}
+		}
 
 		*sprite->surface = IMG_Load(sprite->sprite_img);
 	}
@@ -74,18 +87,34 @@ void change_sprite(Player* sprite)
 		4 - Down
 	*/
 	sprite->cont++;
-	if(sprite->cont % CHANGE == 0)
+	if(sprite->cont % CHANGE == 0)  /// sprite change, same for battle
 	{
 		sprite_change++;
-		if(sprite_change > sprite->sprite_img_limit)
-			sprite_change = 1;
-		switch(sprite->state)
+		if(!sprite->battle.inBattle)
 		{
-			
-			case 1:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkFront",sprite_change,".png");break;
-			case 2:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkLeft",sprite_change,".png");break;
-			case 3:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkRight",sprite_change,".png");break;			
-			case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkDown",sprite_change,".png");break;
+			if(sprite_change > sprite->sprite_img_limit)
+				sprite_change = 1;
+			switch(sprite->state)
+			{
+				
+				case 1:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkFront",sprite_change,".png");break;
+				case 2:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkLeft",sprite_change,".png");break;
+				case 3:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkRight",sprite_change,".png");break;			
+				case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkDown",sprite_change,".png");break;
+			}
+		}
+		else
+		{
+			if(sprite_change > 4)
+				sprite_change = 1;
+
+			switch(sprite->state)
+			{
+				case 1:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleFront",sprite_change,".png");break;
+				case 2:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleLeft",sprite_change,".png");break;
+				case 3:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleRight",sprite_change,".png");break;
+				case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleDown",sprite_change,".png");break;
+			}
 		}
 
 		*sprite->surface = IMG_Load(sprite->sprite_img);			

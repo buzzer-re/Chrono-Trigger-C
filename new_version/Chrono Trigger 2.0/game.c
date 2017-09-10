@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/util.h"
+#include "elements/monster.h"
 #include "elements/background.h"
 #include "elements/player.h"
 #include "utils/move.h"
 #include "utils/collision.h"
-#include "elements/monster.h"
+#include "utils/util.h"
+#include "utils/battle.h"
+
 
 const int WIDTH_SCREEN = 1000;
 const int HEIGTH_SCREEN = 700;
@@ -29,6 +31,8 @@ Background background;
 SDL_Rect stage;
 SDL_Rect player_rect[3];
 SDL_Rect monster_rect[3];
+int inBattle = 0;
+
 
 void destroy();
 int Game();
@@ -104,12 +108,24 @@ int Game()
     cleanAction(&actions);
     while(1)
     {
-    	
+    
 		action(&actions);
-		move_sprite(&player_rect,&actions,&stage,&root_element);
-		move_camera(&player_rect,&stage,&actions,&root_element);
-        move_sprite(&monster_rect,&actions,&stage,&root_element);
-        move_camera(&monster_rect,&stage,&actions,&root_element);
+        for (int i = 0; i < 1; ++i)   
+        {     
+           
+            
+            if(!collision_check(&player_rect[i],&monster_rect[i]) && !inBattle)
+            {
+                move_sprite(&player_rect[i],&monster_rect[i],&actions,&stage,&root_element,"sprite");
+                move_monster(&monster);
+            }else
+            {
+                inBattle = 1;
+                player[i].battle.inBattle = 1;
+                battlePosition(&player_rect,&monster_rect);
+            }
+           
+        }
 
         setStates(&actions,&player[0]);      
 		

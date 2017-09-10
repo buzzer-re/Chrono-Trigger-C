@@ -11,9 +11,9 @@ typedef struct action {
 	int quit;
 }Action;
 
-int move_sprite(SDL_Rect*,Action*,SDL_Rect* background, RootElement* window);
+int move_sprite(SDL_Rect* element,SDL_Rect* other, Action* actions, SDL_Rect* background, RootElement* window, const char* type);
 
-int move_camera(SDL_Rect* sprite, SDL_Rect* background, Action*, RootElement* window);
+int move_camera(SDL_Rect* sprite,SDL_Rect* element, SDL_Rect* background, Action*, RootElement* window,const char*);
 
 int action(Action*); //get keyboard data
 

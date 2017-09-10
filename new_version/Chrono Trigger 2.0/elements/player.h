@@ -4,6 +4,16 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+typedef struct battle {
+	int hp;
+	int mp;
+	int atk;
+	int def;
+	int inBattle;
+	int sprite_img_limit;
+}Battle;
+
+
 typedef struct player{
 	SDL_Renderer** render;
 	SDL_Texture** text;
@@ -16,6 +26,7 @@ typedef struct player{
 	int action;
 	int sprite_img_limit;
 	int up, down , left, rigth;
+	Battle battle;
 }Player;
 
 

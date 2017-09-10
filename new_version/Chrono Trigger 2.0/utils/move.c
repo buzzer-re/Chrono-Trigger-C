@@ -6,52 +6,79 @@
 
 int accel = 1;
 
-int move_sprite(SDL_Rect* element, Action* actions, SDL_Rect* background, RootElement* window)
+int move_sprite(SDL_Rect* sprite,SDL_Rect* element, Action* actions, SDL_Rect* background, RootElement* window, const char* type)
 {
-	int can_up = actions->up && element->y > 0 && (element->y > window->h / 2 || background->y >= 0); 
+	int can_up = actions->up && sprite->y > 0 && (sprite->y > window->h / 2 || background->y >= 0); 
 	
-	int can_right = actions->right && (element->x < window->w - element->w) ;
+	int can_right = actions->right && (sprite->x < window->w - sprite->w) ;
 	
-	int can_left = actions->left && (element->x > 0);
+	int can_left = actions->left && (sprite->x > 0);
 
-	int can_down = actions->down && (element->y < window->h - element->h) && 
-				((element->y < window->h/2) || (background->y <= window->h - background->h) );
+	int can_down = actions->down && (sprite->y < window->h - sprite->h) && 
+				((sprite->y < window->h/2) || (background->y <= window->h - background->h) );
 
 
-	if(can_right)
-		element->x += SPEED * accel;	
+	if(can_right && strcmp("element",type))
+		sprite->x += SPEED * accel;	
 
-	if(can_left)
-		element->x -= SPEED * accel;
+	if(can_left && strcmp("element",type)) 
+		sprite->x -= SPEED * accel;
 
-	if(can_down)  
-		element->y += SPEED * accel;
+	if(can_down && strcmp("element",type))  
+		sprite->y += SPEED * accel;
 
-	if(can_up)
-		element->y -= SPEED * accel;
+	if(can_up && strcmp("element",type))
+		sprite->y -= SPEED * accel;
+
+	move_camera(sprite,element,background,actions,window,type);
 }
+/*
+	move_sprite, receive a SDL_Rect with sprite, and one SDL_Rect with the other element in the screen
+	such, moster or other thing, he make his is statemant, and send that to move_camera
+	on move camera, he will incresse the velocity on element, but as the element was not use before
+	he will always be in the opposite of the sprite!
 
+*/
 
-int move_camera(SDL_Rect* sprite, SDL_Rect* background, Action* action, RootElement* window)
+int move_camera(SDL_Rect* sprite,SDL_Rect* element, SDL_Rect* background, Action* action, RootElement* window, const char* type)
 {
 
-	if(action->right && (window->w < (background->x + background->w)) && sprite->x > window->w/2 )
+	int is_sprite = 1;
+	if(action->right && window->w < (background->x + background->w) && sprite->x > window->w/2)
 	{
-		background->x -= 2 * accel; 
+		if(!strcmp("sprite",type))
+		{
+			background->x -= 2 * accel; 
+		}
 		sprite->x -= 2 * accel;
+		element->x -= 2 * accel;
 	}
 	if(action->left && background->x < 0 && sprite->x < window->w/2)
 	{
-		background->x += 2 * accel;
+		if(!strcmp("sprite",type))
+		{
+			background->x += 2 * accel;
+		}
 		sprite->x += 2 * accel;
+		element->x += 2 * accel;
 	}
+
 	if(action->up && background->y < 0 && sprite->y < window->h/2)
 	{
-		background->y += SPEED * accel;
+		if(!strcmp("sprite",type))
+		{
+			background->y += SPEED * accel;
+		}
+		element->y += SPEED * accel;
 	}
 	if(action->down && (background->y > window->h - background->h) && sprite->y > window->h/2 )
 	{
-		background->y -= SPEED * accel;
+		if(!strcmp("sprite",type))
+		{
+			background->y -= SPEED * accel;	
+		}
+		element->y -= SPEED * accel;
+		
 	}
 }
 

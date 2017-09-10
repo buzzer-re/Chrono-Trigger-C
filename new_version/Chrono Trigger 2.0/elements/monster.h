@@ -8,8 +8,11 @@ typedef struct monster{
 	SDL_Surface** surface;
 	SDL_Rect* monster_rect;
 	int sprite_img_limit;
+	int id;
 }Monster;
 
 int set_monster(Monster*);
+
+int move_monster(Monster*);
 
 #endif
