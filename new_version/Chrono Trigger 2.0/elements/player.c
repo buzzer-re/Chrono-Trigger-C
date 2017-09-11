@@ -106,7 +106,7 @@ void change_sprite(Player* sprite)
 		else
 		{
 			if(sprite_change > 4)
-				sprite_change = 1;
+				sprite_change = 4;
 
 			switch(sprite->state)
 			{

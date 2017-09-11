@@ -1,5 +1,9 @@
 #include <SDL2/SDL.h>
 
+#include "../elements/player.h"
+#include "../elements/monster.h"
+#include "../elements/background.h"
+
 #ifndef _UTIL_H
 #define _UTIL_H
 
@@ -22,6 +26,15 @@ typedef struct root
 	int w;
 	int h;
 }RootElement;
+
+typedef struct scenario {
+	/// contain, all info of scene
+	Player* player;
+	Monster* monster;
+	Background* background;
+	RootElement* root_element;
+}Scenario;
+
 
 int createWindow(SDL_Window**,SDL_Renderer**, const char*,RootElement*);
 

@@ -28,6 +28,7 @@ SDL_Surface* player_surface;
 SDL_Surface* monster_surface;
 RootElement root_element;		//root_element, contains info
 Background background;
+Scenario scene;
 SDL_Rect stage;
 SDL_Rect player_rect[3];
 SDL_Rect monster_rect[3];
@@ -38,6 +39,8 @@ void destroy();
 int Game();
 void loopGame();
 void setStates(Action*, Player*); /// set sprite states
+
+int setScene(); /// set All variables of screen to use in battlestate
 
 int main(int argc, char** argv)
 {
@@ -72,7 +75,8 @@ int Game()
     if(!createStage(&background))
     {
     	SDL_Log("Error creating background %s", SDL_GetError());
-    	destroy(&window, &render);
+    	destroy();
+        return 0;
     }
 
   	player[0].name = "crono";
@@ -106,6 +110,13 @@ int Game()
     }
     Action actions;
     cleanAction(&actions);
+    if(!setScene())
+    {
+        SDL_Log("Error in setting scene! %s", SDL_GetError());
+        destroy();
+        return 0;
+    }
+    /// game actions 
     while(1)
     {
     
@@ -116,13 +127,14 @@ int Game()
             
             if(!collision_check(&player_rect[i],&monster_rect[i]) && !inBattle)
             {
-                move_sprite(&player_rect[i],&monster_rect[i],&actions,&stage,&root_element,"sprite");
+                move_sprite(&player_rect[i],&monster_rect[i],&actions,&stage,&root_element,"sprite",0);
                 move_monster(&monster);
+
             }else
             {
                 inBattle = 1;
                 player[i].battle.inBattle = 1;
-                battlePosition(&player_rect,&monster_rect);
+                move_battle(&scene, &actions);
             }
            
         }
@@ -136,7 +148,7 @@ int Game()
 
 
     destroy();
-    SDL_Quit();
+
    	return 1;
 }
 
@@ -147,23 +159,35 @@ void setStates(Action* action, Player* player)
 
     /// each sprite has a state, who indentify the sprite animation
     player->action = 1;  ///if has action, change sprite, if not, make sprite stop
+    if(!player->battle.inBattle)
+    {
+        if(action->up)
+            player->state = 1;
 
-    if(action->up)
-        player->state = 1;
-
-    else if(action->left)
-        player->state = 2;
+        else if(action->left)
+            player->state = 2;
        
-    else if(action->right)
-        player->state = 3;
+        else if(action->right)
+            player->state = 3;
           
-    else if(action->down)
-        player->state = 4;
-    else
-        player->action = 0;
+        else if(action->down)
+            player->state = 4;
+        else
+            player->action = 0;
+    }
    
      change_sprite(&player[0]);
     
+}
+
+
+int setScene()
+{
+    scene.background = &background;
+    scene.player = &player[0];
+    scene.monster = &monster[0];
+    scene.root_element = &root_element;
+    return 1;
 }
 
 void loopGame()
@@ -181,4 +205,6 @@ void destroy()
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(render);
 	SDL_Log("Bye!");
+    SDL_Quit();
 }
+
