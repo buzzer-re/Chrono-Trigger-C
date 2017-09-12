@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
 int Game()
 {
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0)
     {
     	SDL_Log("Error in init game! %s", SDL_GetError());
     	return 0;
@@ -78,12 +78,12 @@ int Game()
     	destroy();
         return 0;
     }
-
+    loopGame();
   	player[0].name = "crono";
     player[0].render = &render;
     player[0].text = &player_tex;
     player[0].player_rect = &player_rect[0];
-    player[0].surface = &player_surface;	
+    player[0].surface = &player_surface;
     player[0].sprite_img = malloc(sizeof(char) * 100);
     player[0].sprite_img_limit = 6;
 
@@ -97,7 +97,8 @@ int Game()
     for (int i = 0; i < 1; i++)
     {
 
-	    if(!set_sprite(&player[i], 0))
+
+        if(!set_sprite(&player[i], 0))
 	    {
 	    	SDL_Log("Error in creating sprite! %d -> %s", i, SDL_GetError());
 	    }
@@ -107,7 +108,9 @@ int Game()
             SDL_Log("Error in creating monster! %d -> %s", i, SDL_GetError());
         }
 
+
     }
+
     Action actions;
     cleanAction(&actions);
     if(!setScene())
@@ -116,34 +119,37 @@ int Game()
         destroy();
         return 0;
     }
-    /// game actions 
+    /// game actions
     while(1)
     {
-    
-		action(&actions);
-        for (int i = 0; i < 1; ++i)   
-        {     
-           
-            
+			action(&actions);
+        for (int i = 0; i < 1; ++i)
+        {
             if(!collision_check(&player_rect[i],&monster_rect[i]) && !inBattle)
             {
                 move_sprite(&player_rect[i],&monster_rect[i],&actions,&stage,&root_element,"sprite",0);
                 move_monster(&monster);
 
-            }else
+            }
+						else
             {
                 inBattle = 1;
-                player[i].battle.inBattle = 1;
-                move_battle(&scene, &actions);
+                if(move_battle(&scene, &actions) < 0)
+								{
+									player[i].battle.inBattle = 1;
+
+								}
+								if(player[i].battle.inBattle)
+									battle_system(&player,&monster);
             }
-           
+
         }
 
-        setStates(&actions,&player[0]);      
-		
+        setStates(&actions,&player[0]);
+
         if(actions.quit)
 			break;
-		loopGame();    	
+		loopGame();
     }
 
 
@@ -166,18 +172,18 @@ void setStates(Action* action, Player* player)
 
         else if(action->left)
             player->state = 2;
-       
+
         else if(action->right)
             player->state = 3;
-          
+
         else if(action->down)
             player->state = 4;
         else
             player->action = 0;
     }
-   
+
      change_sprite(&player[0]);
-    
+
 }
 
 
@@ -207,4 +213,3 @@ void destroy()
 	SDL_Log("Bye!");
     SDL_Quit();
 }
-

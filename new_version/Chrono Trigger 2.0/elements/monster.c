@@ -9,9 +9,9 @@ int set_monster(Monster* monster)
 
 	if(!*monster->surface)
 	{
+		SDL_Log("Error in load image! %s", SDL_GetError());
 		return 0;
 	}
-
 	*monster->text = SDL_CreateTextureFromSurface(*monster->render, *monster->surface);
 
 	if(!*monster->text)

@@ -12,5 +12,5 @@ OBJ_NAME = 'bin/Chrono Trigger'
 
 Chrono_Trigger : $(OBJS_NAME)
 	@echo 'Building $@..'
-	$(CC) $(OBJS_NAME) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) $(OBJS_NAME) $(LINKER_FLAGS) $(COMPILER_FLAGS) -o $(OBJ_NAME)
 	@echo 'Finished'

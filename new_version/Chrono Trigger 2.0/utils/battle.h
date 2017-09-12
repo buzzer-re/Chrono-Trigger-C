@@ -6,5 +6,6 @@
 #define _BATTLE_H
 
 
+int battle_system(Player*, Monster*);
 
 #endif

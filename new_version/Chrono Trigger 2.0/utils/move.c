@@ -1,6 +1,6 @@
 #include "move.h"
 
-#define SPEED 1
+#define SPEED 4
 #define CHANGE 15
 
 
@@ -22,25 +22,25 @@ int move_sprite(SDL_Rect* sprite,SDL_Rect* element, Action* actions, SDL_Rect* b
 	int can_left = 0;
 	int can_down = 0;
 
-	can_up = actions->up && sprite->y > 0 && (sprite->y > window->h / 2 || background->y >= 0); 
-		
+	can_up = actions->up && sprite->y > 0 && (sprite->y > window->h / 2 || background->y >= 0);
+
 	can_right = actions->right && (sprite->x < window->w - sprite->w) ;
-		
+
 	can_left = actions->left && (sprite->x > 0);
 
-	can_down = actions->down && (sprite->y < window->h - sprite->h) && 
+	can_down = actions->down && (sprite->y < window->h - sprite->h) &&
 					((sprite->y < window->h/2) || (background->y <= window->h - background->h) );
-	
+
 
 
 	if((can_right && strcmp("element",type)) || flag == 1)
-		sprite->x += SPEED * accel;	
+		sprite->x += SPEED * accel;
 
 
-	if((can_left && strcmp("element",type)) || flag == 2) 
+	if((can_left && strcmp("element",type)) || flag == 2)
 		sprite->x -= SPEED * accel;
 
-	if(can_down && strcmp("element",type)  || flag == 3)  
+	if(can_down && strcmp("element",type)  || flag == 3)
 		sprite->y += SPEED * accel;
 
 	if(can_up && strcmp("element",type) || flag == 4)
@@ -64,7 +64,7 @@ int move_camera(SDL_Rect* sprite,SDL_Rect* element, SDL_Rect* background, Action
 	{
 		if(!strcmp("sprite",type))
 		{
-			background->x -= 2 * accel; 
+			background->x -= 2 * accel;
 		}
 		sprite->x -= 2 * accel;
 		element->x -= 2 * accel;
@@ -91,13 +91,12 @@ int move_camera(SDL_Rect* sprite,SDL_Rect* element, SDL_Rect* background, Action
 	{
 		if(!strcmp("sprite",type))
 		{
-			background->y -= SPEED * accel;	
+			background->y -= SPEED * accel;
 		}
 		element->y -= SPEED * accel;
-		
+
 	}
 }
-
 
 int move_battle(Scenario* scene, Action* actions)
 {
@@ -105,25 +104,28 @@ int move_battle(Scenario* scene, Action* actions)
 	SDL_Rect* monster = scene->monster->monster_rect;
 	SDL_Rect* root_element = scene->root_element;
 	SDL_Rect* background = scene->background;
-
+	Player* sprite = scene->player;
 	/*
 
 		 Y adjust
 	*/
-	if(player->y - monster->y < monster->h * 2)
-	{ 
+	if(player->y - monster->y < monster->h * 2 && monster->y - player->y < 0)
+	{
 		SDL_Log("Meu y é maior que o do monstro!");
 		move_sprite(player,monster,actions,background,root_element,"sprite",3);
 	}
-
+	else if(monster->y - player->y < monster->h * 2 && monster->y - player->y > monster->h)
+	{
+		SDL_Log("Meu y é menor que o do monstro!");
+		move_sprite(player,monster,actions,background,root_element,"sprite",4);
+	}
 
 	/*
 
 			X adjust
 	*/
-	if(player->x != monster->x)
+ else if(player->x < monster->x + monster->h/2 && player->x - monster->x > 2)
 	{
-		SDL_Log("Player X - %d Monster X - %d", player->x,monster->x);
 		if(player->x < monster->x)
 		{
 			move_sprite(player,monster,actions,background,root_element,"sprite",1);
@@ -135,15 +137,22 @@ int move_battle(Scenario* scene, Action* actions)
 		}
 	}
 
+	else
+	{
+		// after everything has been set
+		return -1;
+	}
 
-	
+
+	return 1;
 }
 
 int action(Action* action)
-{	
+{
+
 	SDL_Event event; /// catch events
 	while(SDL_PollEvent(&event) != 0)
-	{	
+	{
 		switch(event.type)
 		{
 			case SDL_KEYDOWN:
