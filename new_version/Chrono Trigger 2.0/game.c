@@ -217,7 +217,7 @@ void setStates(Action* action, Player* player)
 
 int setScene()
 {
-    scene.background = &background;
+    scene.background = &stage;
     scene.player = &player[0];
     scene.monster = &monster[0];
     scene.root_element = &root_element;
@@ -235,7 +235,7 @@ void findPos()
 
 void loopGame()
 {
-	SDL_RenderClear(render);
+    SDL_RenderClear(render);
     SDL_RenderCopy(render, stage_tex, NULL, &stage);
     SDL_RenderCopy(render, monster_text, NULL, &monster_rect);
     SDL_RenderCopy(render, player_tex, NULL, &player_rect);
@@ -245,9 +245,9 @@ void loopGame()
 
 void destroy()
 {
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(render);
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(render);
     Mix_FreeMusic(bgm);
-	SDL_Log("Bye!");
+    SDL_Log("Bye!");
     SDL_Quit();
 }
