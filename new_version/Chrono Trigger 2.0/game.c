@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -33,9 +34,15 @@ SDL_Rect stage;
 SDL_Rect player_rect[3];
 SDL_Rect monster_rect[3];
 int inBattle = 0;
+int contMusic = 0; /// music counter, control player state
 
+///Effects
+
+Mix_Music* bgm; /// background music
+Mix_Music* battle; /// battle song
 
 void destroy();
+void findPos();
 int Game();
 void loopGame();
 void setStates(Action*, Player*); /// set sprite states
@@ -58,6 +65,13 @@ int Game()
     	return 0;
     }
 
+    if(Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0 )
+    {
+        SDL_Log("Error initing audio! %s", Mix_GetError());
+    }
+
+    bgm = Mix_LoadMUS("effects/audio/zeal.mp3");
+    battle = Mix_LoadMUS("effects/audio/battle11.mp3");
     root_element.w = WIDTH_SCREEN;
     root_element.h = HEIGTH_SCREEN;
 
@@ -79,7 +93,7 @@ int Game()
         return 0;
     }
     loopGame();
-  	player[0].name = "crono";
+    player[0].name = "crono";
     player[0].render = &render;
     player[0].text = &player_tex;
     player[0].player_rect = &player_rect[0];
@@ -99,9 +113,9 @@ int Game()
 
 
         if(!set_sprite(&player[i], 0))
-	    {
-	    	SDL_Log("Error in creating sprite! %d -> %s", i, SDL_GetError());
-	    }
+        {
+          SDL_Log("Error in creating sprite! %d -> %s", i, SDL_GetError());
+        }
 
         if(!set_monster(&monster[i]))
         {
@@ -113,34 +127,48 @@ int Game()
 
     Action actions;
     cleanAction(&actions);
+    Mix_PlayMusic(bgm, -1);
     if(!setScene())
     {
         SDL_Log("Error in setting scene! %s", SDL_GetError());
         destroy();
         return 0;
     }
-    /// game actions
+        /// game actions
     while(1)
-    {
-			action(&actions);
+    {   
         for (int i = 0; i < 1; ++i)
         {
+            action(&actions);     
+
             if(!collision_check(&player_rect[i],&monster_rect[i]) && !inBattle)
             {
                 move_sprite(&player_rect[i],&monster_rect[i],&actions,&stage,&root_element,"sprite",0);
                 move_monster(&monster);
 
             }
-						else
+            else
             {
+                if(!contMusic)
+                {
+                    Mix_PauseMusic();
+                    Mix_PlayMusic(battle,-1);
+                    contMusic = 1;
+                }
                 inBattle = 1;
+                player[i].battle.inBattle = 1;
+                player[i].battle.preparing = 1;
                 if(move_battle(&scene, &actions) < 0)
-								{
-									player[i].battle.inBattle = 1;
+                {
+                    player[i].battle.inBattle = 1;
+                    player[i].battle.preparing = 0;
 
-								}
-								if(player[i].battle.inBattle)
-									battle_system(&player,&monster);
+                }
+
+                if(player[i].battle.inBattle){
+                    findPos();
+                    battle_system(&player,&monster);
+                }
             }
 
         }
@@ -148,14 +176,14 @@ int Game()
         setStates(&actions,&player[0]);
 
         if(actions.quit)
-			break;
-		loopGame();
+            break;
+        loopGame();
     }
 
 
     destroy();
 
-   	return 1;
+    return 1;
 }
 
 
@@ -182,7 +210,7 @@ void setStates(Action* action, Player* player)
             player->action = 0;
     }
 
-     change_sprite(&player[0]);
+    change_sprite(&player[0]);
 
 }
 
@@ -194,6 +222,15 @@ int setScene()
     scene.monster = &monster[0];
     scene.root_element = &root_element;
     return 1;
+}
+
+
+void findPos()
+{
+    if(player->player_rect->y > monster->monster_rect->y) /// lower
+        player->state = 1;
+    else if(player->player_rect->y < monster->monster_rect->y) // upper
+        player->state = 4;
 }
 
 void loopGame()
@@ -210,6 +247,7 @@ void destroy()
 {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(render);
+    Mix_FreeMusic(bgm);
 	SDL_Log("Bye!");
     SDL_Quit();
 }

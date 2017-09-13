@@ -12,6 +12,7 @@ typedef struct battle {
 	int def;
 	int inBattle;
 	int sprite_img_limit;
+	int preparing;
 }Battle;
 
 

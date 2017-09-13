@@ -1,6 +1,6 @@
 #include "move.h"
 
-#define SPEED 4
+#define SPEED 3
 #define CHANGE 15
 
 
@@ -8,7 +8,7 @@ int accel = 1;
 
 int move_sprite(SDL_Rect* sprite,SDL_Rect* element, Action* actions, SDL_Rect* background, RootElement* window, const char* type, int flag)
 {
-	/// flag is move sprite for batte status!, default = 0;
+	/// flag is move sprite to battle status!, default = 0;
 	/*
 
 		Flags
@@ -29,7 +29,7 @@ int move_sprite(SDL_Rect* sprite,SDL_Rect* element, Action* actions, SDL_Rect* b
 	can_left = actions->left && (sprite->x > 0);
 
 	can_down = actions->down && (sprite->y < window->h - sprite->h) &&
-					((sprite->y < window->h/2) || (background->y <= window->h - background->h) );
+	((sprite->y < window->h/2) || (background->y <= window->h - background->h) );
 
 
 
@@ -113,27 +113,38 @@ int move_battle(Scenario* scene, Action* actions)
 	{
 		SDL_Log("Meu y é maior que o do monstro!");
 		move_sprite(player,monster,actions,background,root_element,"sprite",3);
+		sprite->state = 1;
+		// sprite->action = 1;
+		change_sprite(sprite);
 	}
 	else if(monster->y - player->y < monster->h * 2 && monster->y - player->y > monster->h)
 	{
+		// sprite->state = 3;
+		// sprite->action = 1;
 		SDL_Log("Meu y é menor que o do monstro!");
 		move_sprite(player,monster,actions,background,root_element,"sprite",4);
+		change_sprite(sprite);
 	}
 
 	/*
 
 			X adjust
 	*/
- else if(player->x < monster->x + monster->h/2 && player->x - monster->x > 2)
+	else if(player->x < monster->x + monster->h/2 && player->x - monster->x > 2)
 	{
 		if(player->x < monster->x)
 		{
+			sprite->state = 1;
+			sprite->action = 1;
 			move_sprite(player,monster,actions,background,root_element,"sprite",1);
+			change_sprite(sprite);
 		}
 		else
 		{
-
+			sprite->state = 2;
+			sprite->action = 1;
 			move_sprite(player,monster,actions,background,root_element,"sprite",2);
+			change_sprite(sprite);
 		}
 	}
 
@@ -159,43 +170,43 @@ int action(Action* action)
 			switch(event.key.keysym.scancode)
 			{
 				case SDL_SCANCODE_UP:
-					action->up = 1;
-					break;
+				action->up = 1;
+				break;
 				case SDL_SCANCODE_DOWN:
-					action->down = 1;
-					break;
+				action->down = 1;
+				break;
 				case SDL_SCANCODE_LEFT:
-					action->left = 1;
-					break;
+				action->left = 1;
+				break;
 				case SDL_SCANCODE_RIGHT:
-					action->right = 1;
-					break;
+				action->right = 1;
+				break;
 				case SDL_SCANCODE_Q:
-					action->quit = 1;
-					break;
+				action->quit = 1;
+				break;
 				case SDL_SCANCODE_K:
-					accel = 5;
-					break;
+				accel = 5;
+				break;
 			}break;
 
 			case SDL_KEYUP:
 			switch(event.key.keysym.scancode)
 			{
 				case SDL_SCANCODE_UP:
-					action->up = 0;
-					break;
+				action->up = 0;
+				break;
 				case SDL_SCANCODE_DOWN:
-					action->down = 0;
-					break;
+				action->down = 0;
+				break;
 				case SDL_SCANCODE_LEFT:
-					action->left = 0;
-					break;
+				action->left = 0;
+				break;
 				case SDL_SCANCODE_RIGHT:
-					action->right = 0;
-					break;
+				action->right = 0;
+				break;
 				case SDL_SCANCODE_K:
-					accel = 1;
-					break;
+				accel = 1;
+				break;
 			}
 		}
 	}

@@ -13,10 +13,12 @@ typedef struct element
 	SDL_Renderer** render;
 	SDL_Texture** text;
 	SDL_Surface** surface;
+	SDL_Rect* rect;
 	int x;
 	int y;
 	int width;
 	int heigth;
+	const char* surface_path;
 }Element;
 
 
@@ -39,5 +41,5 @@ typedef struct scenario {
 
 int createWindow(SDL_Window**,SDL_Renderer**, const char*,RootElement*);
 
-int createElement(SDL_Renderer**, SDL_Texture**,Element*, RootElement*);
+int createElement(Element*);
 #endif

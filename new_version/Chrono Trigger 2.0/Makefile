@@ -5,7 +5,7 @@ CC = gcc
 
 COMPILER_FLAGS = -w -std=c99
 
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer
 
 OBJ_NAME = 'bin/Chrono Trigger'
 

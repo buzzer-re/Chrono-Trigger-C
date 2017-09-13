@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define CHANGE 6
+
 int sprite_change = 0;
 
 int set_sprite(Player* sprite, int flag)
@@ -70,8 +71,8 @@ int set_sprite(Player* sprite, int flag)
 	sprite->player_rect->h *= 3;
 
 	if(!flag){
-		sprite->player_rect->x = 400;
-		sprite->player_rect->y = 500;
+		sprite->player_rect->x = 520;
+		sprite->player_rect->y = 600;
 	}
 	return 1;
 }
@@ -90,10 +91,12 @@ void change_sprite(Player* sprite)
 	if(sprite->cont % CHANGE == 0)  /// sprite change, same for battle
 	{
 		sprite_change++;
+		/// walk normal moves
 		if(!sprite->battle.inBattle)
 		{
 			if(sprite_change > sprite->sprite_img_limit)
 				sprite_change = 1;
+			SDL_Log("Sprite change! %d", sprite_change);
 			switch(sprite->state)
 			{
 
@@ -103,17 +106,27 @@ void change_sprite(Player* sprite)
 				case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"WalkDown",sprite_change,".png");break;
 			}
 		}
+		///// battle moves
 		else
 		{
-			if(sprite_change > 4)
-				sprite_change = 4;
+			if(!sprite->battle.preparing){
+				if(sprite_change > 4)
+					sprite_change = 4;
 
-			switch(sprite->state)
+				switch(sprite->state)
+				{
+					case 1:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleFront",sprite_change,".png");break;
+					case 2:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleLeft",sprite_change,".png");break;
+					case 3:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleRight",sprite_change,".png");break;
+					case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleDown",sprite_change,".png");break;
+				}
+			}
+			else
 			{
-				case 1:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleFront",sprite_change,".png");break;
-				case 2:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleLeft",sprite_change,".png");break;
-				case 3:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleRight",sprite_change,".png");break;
-				case 4:sprintf(sprite->sprite_img,"%s%s%s%d%s","resourcers/",sprite->name,"BattleDown",sprite_change,".png");break;
+				switch(sprite->state)
+				{
+					case 1:sprite->player_rect->y += 5;sprintf(sprite->sprite_img,"%s%s%s","resourcers/",sprite->name,"AtaqueBack.png");break;
+				}
 			}
 		}
 
