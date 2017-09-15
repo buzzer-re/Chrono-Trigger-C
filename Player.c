@@ -31,8 +31,8 @@ int setupSprite(PlayerConf* conf,SDL_Rect* spriteRect)
 		conf->pathSprite = malloc(sizeof(char) * 40);
 
 		conf->up = conf->down = conf->left = conf->rigth = 0;
-		spriteRect->x = 400;
-		spriteRect->y = 500;
+		spriteRect->x = 520;
+		spriteRect->y = 510;
 
 		up = down = left = right = 0;
 	}
@@ -96,7 +96,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 		if(conf->rigth)
 			sprintf(conf->pathSprite, "%s%d%s", "Resourcers/cronoWalkRight",conf->numSprite, ".png");
 
-		if(conf->down || conf->flag == 2)
+		if(conf->down )
 			sprintf(conf->pathSprite, "%s%d%s", "Resourcers/cronoWalkDown", conf->numSprite, ".png");
 
 		if(conf->up && conf->run)
@@ -116,7 +116,7 @@ void changeSprite(PlayerConf* conf,SDL_Rect* sprite_rect,int reset)
 //			SDL_Log("to aqui ó -> %s", conf->pathSprite);
 		}
 
-		else if(conf->battleState && conf->battle->adjust == 1 && conf->state){
+		else if(conf->flag == 2 || conf->battleState && conf->battle->adjust == 1 && conf->state){
 			sprintf(conf->pathSprite,"%s","Resourcers/cronoAtaqueBack.png");
 		}
 

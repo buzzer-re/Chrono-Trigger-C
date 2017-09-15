@@ -18,6 +18,8 @@ typedef struct monsterBattle{
 	int atk, def;
 	int critical;
 	int isDead;
+	int damage;
+	int inBattle;
 }MonsterBattle;
 
 typedef struct monster_info{
@@ -36,9 +38,12 @@ typedef struct monster_info{
 }MonsterInfo;
 
 int variacaoSpriteM;
+int variacaoChange;
+int spriteNum;
 
 void setupMonster(MonsterInfo*);
 
 void moveMonster(MonsterInfo*);
 
+void changeMonster(MonsterInfo*);
 #endif /* MONSTER_H_ */

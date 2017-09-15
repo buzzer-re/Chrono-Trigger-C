@@ -168,7 +168,7 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 			case 2: cursor->rect->y = cursor->y/5 + cursor->height * 3;break;
 			case 3: cursor->rect->y = cursor->y + cursor->height/3;break;
 			}
-			SDL_Delay(50);
+			SDL_Delay(100);
 		}else
 			contUp = 0;
 
@@ -183,7 +183,7 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 			case 2: cursor->rect->y = cursor->y/5 + cursor->height * 3;break;
 			case 3: cursor->rect->y = cursor->y;break;
 			}
-			SDL_Delay(50);
+			SDL_Delay(100);
 		}else
 			contDown = 0;
 //		SDL_Log("Down -> %d", contDown);
@@ -278,7 +278,7 @@ void change(PlayerConf* player, MonsterInfo* monster,STAGE* stage,int flag){
 	if(player->up ||player->flag)
 		limit = 6;
 	if(player->down || player->flag == 2)
-		limit = 8;
+		limit = 6;
 	if(player->rigth || player->flag == 3)
 		limit = 6;
 	if(player->left || player->flag == 4)
@@ -330,9 +330,10 @@ int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 		monster->battleState = 1;
 		return 1;
 	}
+
 	return 0;
 }
-
+int contDemage = 0;
 int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 	if(player->sprite->x != monster->monsterRect->x){
 		variacaoSprite++;
@@ -366,6 +367,11 @@ int battleConf(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 		player->flag = 2;
 		cameraAdjust(stage, player->sprite, monster,2);
 		change(player, monster,stage, NULL);
+		contDemage += 2;
+		if(contDemage % 50 == 0){
+			monster->battle->damage = 0;
+			contDemage = 0;
+		}
 	}
 
 

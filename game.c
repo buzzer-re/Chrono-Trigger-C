@@ -23,8 +23,8 @@
 #include "Move.h"
 #include "Batalha.h"
 
-#define WIDTH_SCREEN 800
-#define HEIGH_SCREEN 640
+#define WIDTH_SCREEN 1000
+#define HEIGH_SCREEN 700
 #define FPS 6
 
 
@@ -91,7 +91,8 @@ int main(int argc, char **argv) {
 	monster->tex = &monsterTex;
 	monster->monsterRect = &monsterRect;
 	monster->stage_conf = &stage_conf;
-	monster->x = 400;
+	monster->pathSprite = malloc(sizeof(char) * 40);
+	monster->x = 448; 
 	monster->y = -100;
 	setupMonster(monster);
 
@@ -129,6 +130,16 @@ int main(int argc, char **argv) {
 	cursor->text = &cursorTex;
 	setElement(cursor);
 
+	SDL_Rect imageBox;
+	SDL_Texture* imageText;
+	Element* avatar = (Element*) malloc(sizeof(Element) * 50);
+	avatar->render = &render;
+	avatar->surface = &surface;
+	avatar->rect = &imageBox;
+	avatar->path = "Resourcers/CronoStatus.png";
+	avatar->text = &imageText;
+	setElement(avatar);
+
 	if(!setupSprite(crono_conf, &crono))
 	{
 		SDL_Log("Error s %s", SDL_GetError());
@@ -148,16 +159,17 @@ int main(int argc, char **argv) {
 		if(!monster->battle->isDead){
 			SDL_RenderCopy(render,monsterTex,NULL,&monsterRect);
 			moveMonster(monster);
+
 		}
 		SDL_RenderCopy(render, tex, NULL, &crono);
 
 		collisionCheck(crono_conf, &stage_conf, monster);
-
 		if(move(&crono,&run,crono_conf,&stage_conf,monster,cursor)){
 			if(!battle){
 				Mix_PlayMusic(battleSong, -1);
 				battle = 1;
 			}
+			
 			SDL_SetRenderDrawColor(render, 1, 1, 71, 255);
 			menuPlayer(&menu, WIDTH_SCREEN, HEIGH_SCREEN,1);
 			SDL_RenderFillRect(render,&menu);
@@ -166,18 +178,20 @@ int main(int argc, char **argv) {
 			SDL_SetRenderDrawColor(render,255, 255, 255, 255);
 			SDL_RenderCopy(render, textTex, NULL, &textRect);
 			battleSystem(&menu, crono_conf, monster, &stage_conf, options);
+			changeMonster(monster);
 			setText(crono_conf,options,1);
-			setupOptions(text, &menu,cursor);
+			setupOptions(text, &menu,cursor,avatar);
 			if(crono_conf->battle->ataqueNormal != 1){
-				SDL_RenderCopy(render, textTex, NULL, &textRect);
-				SDL_RenderCopy(render, cursorTex, NULL, &optionBox);
+				SDL_RenderCopy(render, textTex, NULL, &textRect);			
+				SDL_RenderCopy(render, cursorTex, NULL, &optionBox);			
 			}
+			SDL_RenderCopy(render, imageText, NULL, &imageBox);
 		}else{
 			if(battle) Mix_PlayMusic(bgm,-1);
 			battle = 0;
 		}
 
-		SDL_SetRenderDrawColor(render,255, 255, 255, 255);
+		SDL_SetRenderDrawColor(render,0, 0, 0, 255);
 		SDL_RenderPresent(render);
 		SDL_Delay(FPS);
 
@@ -188,8 +202,9 @@ int main(int argc, char **argv) {
 	Mix_Quit();
 	SDL_DestroyRenderer(render);
 	SDL_DestroyWindow(window);
-	SDL_Quit();
 	TTF_Quit();
+	SDL_Quit();
+	
 	//	free(crono_conf->battle);
 	//	free(crono_conf->pathSprite);
 	//	free(crono_conf->name);

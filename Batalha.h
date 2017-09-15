@@ -33,7 +33,7 @@ int setText(PlayerConf*,Text*,int);
 
 void setupInfo(Text*,SDL_Rect*);
 
-void setupOptions(Text*,SDL_Rect*,Element*);
+void setupOptions(Text*,SDL_Rect*,Element*,Element*);
 
 int battleSystem(SDL_Rect*,PlayerConf*,MonsterInfo*,STAGE*,Text*);
 

@@ -10,9 +10,6 @@
 #include "Stage.h"
 
 
-
-
-
 void setupStage(STAGE* stage_conf){
 	*stage_conf->surface = IMG_Load("Resourcers/magus.png");
 	if(!*stage_conf->surface){

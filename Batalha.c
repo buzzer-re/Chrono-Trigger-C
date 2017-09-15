@@ -70,6 +70,7 @@ int battleSystem(SDL_Rect* menu,PlayerConf* player,MonsterInfo* monster,STAGE* s
 			player->up = 1;
 			cameraAdjust(stage, player->sprite, monster,1);
 			change(player, monster,stage, NULL);
+
 		}
 		else{
 			player->flag = 6;
@@ -77,6 +78,8 @@ int battleSystem(SDL_Rect* menu,PlayerConf* player,MonsterInfo* monster,STAGE* s
 			player->battle->readyAtaque = 1;
 			change(player, monster,stage, NULL);
 			contadorAtaque = 0;
+
+			
 		}
 	}
 	if(player->battle->adjust == 1){
@@ -84,18 +87,21 @@ int battleSystem(SDL_Rect* menu,PlayerConf* player,MonsterInfo* monster,STAGE* s
 		if(!contadorAtaque){
 			int hit = calculateHit(player);
 			SDL_Log("Hit -> %d", hit);
-			monster->battle->hp -=   hit ;//calculateHit(player);
+			monster->battle->hp -= hit ;
+			monster->battle->damage = 1;
 			SDL_Log("Vida monstro -> %d ", monster->battle->hp);
 			contadorAtaque = 1;
 		}
+		
+		
 	}
 
 	if(monster->battle->hp <= 0 && player->battle->adjust != 1){
 		player->ready = 0;
 		player->battleState = 0;
+		// player->up = 1;
 		monster->battle->hp = 100;
 		monster->battleState = 0;
-//		player->up = 1
 		monster->battle->isDead = 1;
 		player->state = 1;
 		changeSprite(player,player->sprite,1);
@@ -116,7 +122,7 @@ int calculateHit(PlayerConf* player){
 
 	return dano;
 }
-void setupOptions(Text* text, SDL_Rect* menu,Element* choose){
+void setupOptions(Text* text, SDL_Rect* menu,Element* choose,Element* avatar){
 	text->textRect->w = (menu->w)/6;
 	text->textRect->h = (menu->h) ;
 	text->textRect->x = (text->textRect->w);
@@ -127,6 +133,11 @@ void setupOptions(Text* text, SDL_Rect* menu,Element* choose){
 	choose->rect->w *= 2;
 	choose->rect->h *= 2;
 
+	avatar->rect->w = (menu->w)/6;
+	avatar->rect->h = (menu->h);
+	// avatar->rect->w * 2;
+	// avatar->rect->h * 2;
+
 	if(!contSetup){
 		choose->rect->y = text->textRect->y;
 		contSetup = 1;
@@ -134,30 +145,8 @@ void setupOptions(Text* text, SDL_Rect* menu,Element* choose){
 	choose->rect->x = text->textRect->x - (text->textRect->x/2);
 	choose->height = text->textRect->h;
 	choose->y = text->textRect->y;
+
+	avatar->rect->x = (text->textRect->w) * 4;
+	avatar->rect->y = menu->y;
+	SDL_Log("avatar %d", choose->rect->x);
 }
-
-
-/*
- *
- *
- * 	CODIGO PARA SER ANALISADO, FUTURAMENTE!
- *
- *
- * 	//		if(player->sprite->x != monster->monsterRect->x){
-//			variacaoSprite++;
-//			if(player->sprite->x < monster->monsterRect->x){
-//				player->rigth = 1;
-//				change(player, monster,stage,4);
-//				cameraAdjust(stage,  player->sprite, monster, 4);
-//			}
-//			else{
-//				player->flag = 3;
-//				player->left = 1;
-//				change(player, monster,stage,3);
-//				cameraAdjust(stage,  player->sprite, monster, 3);
-//			}
-//		}
- *
- *
- *
- */
