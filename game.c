@@ -28,8 +28,16 @@
 #define FPS 6
 
 
-int main(int argc, char **argv) {
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0){
+int main(int argc, char **argv) 
+{
+	Game();
+}
+
+
+int Game()
+{
+	int reset = 0;
+		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0){
 		SDL_Log("Error in init! %s", SDL_GetError());
 		return -1;
 	}
