@@ -4,7 +4,7 @@
 #include <SDL2/SDL_timer.h>
 
 void initScreen(SDL_Window** window, SDL_Renderer** render,int width, int heigth){
-	*window = SDL_CreateWindow("Chrono Trigger", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,width,heigth,0);
+	*window = SDL_CreateWindow("Chrono Trigger engine test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,width,heigth,0);
 	if(!*window)
 	{
 		SDL_Log("Error while create window! %s", SDL_GetError());
