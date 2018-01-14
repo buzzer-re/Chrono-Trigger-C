@@ -105,6 +105,7 @@ int Game()
 	setupMonster(monster);
 
 	SDL_Rect menu;
+  menu.w = 0;
 	SDL_Rect optionsRect;
 	Text* text = (Text*) malloc(sizeof(Text) * 50);
 	Text* options = (Text*) malloc(sizeof(Text) * 50);

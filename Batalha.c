@@ -18,7 +18,7 @@ void menuPlayer(SDL_Rect* menu,int width, int height,int flag){
 
 	if(menu->w <= width - (width/10))
 		menu->w += 25;
-
+  SDL_Log("w -> %d\nw -> %d", menu->w, (width - (width/10)));
 	menu->y = (height - menu->h) - menu->h/12 ;
 	menu->x = (width - menu->w) / 2;
 }
@@ -54,7 +54,6 @@ int setText(PlayerConf* player ,Text* text,int flag){
 }
 
 void setupInfo(Text* text,SDL_Rect* menu){
-
 	text->textRect->w = (menu->w)/6;
 	text->textRect->h = (menu->h);
 	text->textRect->x = (menu->w - text->textRect->w) + text->textRect->w/2;
@@ -123,20 +122,21 @@ int calculateHit(PlayerConf* player){
 	return dano;
 }
 void setupOptions(Text* text, SDL_Rect* menu,Element* choose,Element* avatar){
-	text->textRect->w = (menu->w)/6;
+	SDL_Log("%d\n", menu->w);
+  text->textRect->w = (menu->w)/6;
 	text->textRect->h = (menu->h) ;
 	text->textRect->x = (text->textRect->w);
 	text->textRect->y = (menu->y);
 
-	choose->rect->w = 20;
-	choose->rect->h = 20;
-	choose->rect->w *= 2;
-	choose->rect->h *= 2;
+	choose->rect->w = 40;
+	choose->rect->h = 40;
+  //choose->rect->w *= 2;
+	//choose->rect->h *= 2;
 
 	avatar->rect->w = (menu->w)/6;
 	avatar->rect->h = (menu->h);
-	// avatar->rect->w * 2;
-	// avatar->rect->h * 2;
+	//avatar->rect->w * 2;
+	//avatar->rect->h * 2;
 
 	if(!contSetup){
 		choose->rect->y = text->textRect->y;
