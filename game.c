@@ -180,7 +180,7 @@ int Game()
 			}
 			
 			SDL_SetRenderDrawColor(render, 1, 1, 71, 255);
-			menuPlayer(&menu, WIDTH_SCREEN, HEIGH_SCREEN,1);
+			crono_conf->menuOk = menuPlayer(&menu, WIDTH_SCREEN, HEIGH_SCREEN,1);
 			SDL_RenderFillRect(render,&menu);
 			setText(crono_conf,text,0);
 			setupInfo(text,&menu);

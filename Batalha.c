@@ -13,14 +13,17 @@ int done = 0;
 int contadorAtaque = 0;
 int contSetup = 0;
 
-void menuPlayer(SDL_Rect* menu,int width, int height,int flag){
+int menuPlayer(SDL_Rect* menu,int width, int height,int flag){
 	menu->h = (height/4) ;
 
 	if(menu->w <= width - (width/10))
 		menu->w += 25;
+  else
+    return 1;
   SDL_Log("w -> %d\nw -> %d", menu->w, (width - (width/10)));
 	menu->y = (height - menu->h) - menu->h/12 ;
 	menu->x = (width - menu->w) / 2;
+  return 0;
 }
 
 int setText(PlayerConf* player ,Text* text,int flag){

@@ -42,7 +42,6 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 	//End menu options
 
 	SDL_Event event;
-
 	if(variacaoSprite > 2000)
 		variacaoSprite = 0;
 
@@ -55,8 +54,9 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 			case SDL_SCANCODE_UP:
 				if(!conf->battleState){
 					conf->up = 1;
-
-				}
+				} else {
+          conf->up = 0;
+        }
 				up = 1;
 				break;
 			case SDL_SCANCODE_LEFT:
@@ -159,8 +159,8 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 		if(!conf->battleState) accel = 1;
 	///
 	///Menu Cursor
-
-	if(up && conf->battleState){
+  int can_move_cursor = conf->battleState && conf->ready && conf->menuOk && !conf->battle->ataqueNormal && !conf->battle->adjust;
+	if(up && can_move_cursor){
 		contUp++;
 		if(contUp > 0 && contUp <= 3){
 			switch(contUp){
@@ -175,7 +175,7 @@ int move(SDL_Rect* sprite,int* isGame,PlayerConf* conf,STAGE* stage_conf,Monster
 		SDL_Log("UP -> %d", contUp);
 	}
 
-	if(down && conf->battleState){
+	if(down && can_move_cursor){
 		contDown++;
 		if(contDown > 0 && contDown <= 3){
 			switch(contDown){
@@ -328,6 +328,7 @@ int collisionCheck(PlayerConf* player,STAGE* stage, MonsterInfo* monster){
 		}
 		player->battleState = 1;
 		monster->battleState = 1;
+    SDL_Log("colidiu!\n");
 		return 1;
 	}
 

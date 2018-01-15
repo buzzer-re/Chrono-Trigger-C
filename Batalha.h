@@ -27,7 +27,7 @@ typedef struct text_info{
 
 int readyAtaque;
 
-void menuPlayer(SDL_Rect*,int,int,int);
+int menuPlayer(SDL_Rect*,int,int,int);
 
 int setText(PlayerConf*,Text*,int);
 

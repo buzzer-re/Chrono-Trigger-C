@@ -41,7 +41,7 @@ typedef struct player_info {
 	char *textMenu;
 	int state;
 	int battleState, ready;
-
+  int menuOk;
 	PlayerBattle* battle;
 }PlayerConf;
 
